@@ -35,6 +35,13 @@ const Menuitems: MenuitemsType[] = [
 
         chip: "Pro",
     },
+
+    {
+        id: uniqueId(),
+        title: "Productos",
+        icon: "box-linear",
+        href: "/productos",
+    },
    
     {
         navlabel: true,
