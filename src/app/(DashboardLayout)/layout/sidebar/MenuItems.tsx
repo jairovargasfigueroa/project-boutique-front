@@ -42,6 +42,14 @@ const Menuitems: MenuitemsType[] = [
         icon: "box-linear",
         href: "/productos",
     },
+
+    {
+        id: uniqueId(),
+        title: "Catalogo",
+        icon: "box-linear",
+        href: "/catalogo",
+    },
+   
    
     {
         navlabel: true,
