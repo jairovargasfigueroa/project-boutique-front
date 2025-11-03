@@ -1,25 +1,27 @@
 export interface Producto {
-
   id: number;
   nombre: string;
-  categoria: string;
+  categoria: number;
+  categoria_nombre: string;
   precio_base: number;
-  genero : string;
-  descripcion:string;
-  imagen?:string;
+  genero: string;
+  descripcion: string;
+  imagen_url?: string;
+  stock: number;
 }
 
 export interface ProductoVariante {
   id: number;
-  talla : string;
+  talla: string;
   color: string;
-  precio_venta?: number;
+  precio_venta: number;
   precio_costo?: number;
-  imagen?: string;
   stock: number;
   stock_minimo?: number;
-  genero?: string;
-  producto:number;
+  producto: number;
 }
-
-
+export interface Categoria {
+  id: number;
+  nombre: string;
+  descripcion: string;
+}

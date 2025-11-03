@@ -1,7 +1,7 @@
 export interface TableColumn {
   key: string;
   label: string;
-  align?: 'left' | 'center' | 'right';
+  align?: "left" | "center" | "right";
   render?: (value: any, row: any) => React.ReactNode;
   width?: string;
 }

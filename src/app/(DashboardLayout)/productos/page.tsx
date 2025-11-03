@@ -1,40 +1,41 @@
-'use client';
-import React, { useState } from 'react';
-import { Box } from '@mui/material';
-import { useProductos } from '@/hooks/useProductos';
-import { Producto } from '@/types/productos';
-import ProductosTable from './components/ProductosTable';
-import ProductoDialog from './components/ProductoDialog';
+"use client";
+import React, { useState } from "react";
+import { Box } from "@mui/material";
+import { useProductos } from "@/hooks/useProductos";
+import { Producto } from "@/types/productos";
+import ProductosTable from "./components/ProductosTable";
+import ProductoDialog from "./components/ProductoDialog";
 
 export default function ProductosPage() {
   const {
     productos,
     loading,
-    error, 
+    error,
     createProducto,
     updateProducto,
     deleteProducto,
-    refetch
+    refetch,
   } = useProductos();
 
   const [openDialog, setOpenDialog] = useState(false);
-  const [modo, setModo] = useState<'create' | 'edit'>('create');
-  const [productoSeleccionado, setProductoSeleccionado] = useState<Producto | null>(null);
+  const [modo, setModo] = useState<"create" | "edit">("create");
+  const [productoSeleccionado, setProductoSeleccionado] =
+    useState<Producto | null>(null);
 
   const handleNew = () => {
-    setModo('create');
+    setModo("create");
     setProductoSeleccionado(null);
     setOpenDialog(true);
   };
 
   const handleEdit = (producto: Producto) => {
-    setModo('edit');
+    setModo("edit");
     setProductoSeleccionado(producto);
     setOpenDialog(true);
   };
 
   const handleSubmit = async (data: Partial<Producto>) => {
-    if (modo === 'create') {
+    if (modo === "create") {
       await createProducto(data);
     } else if (productoSeleccionado) {
       await updateProducto(productoSeleccionado.id, data);
@@ -45,7 +46,7 @@ export default function ProductosPage() {
 
   const handleDelete = async (producto: Producto) => {
     if (confirm(`¿Eliminar "${producto.nombre}"?`)) {
-      console.log('producto',producto)
+      console.log("producto", producto);
       setProductoSeleccionado(producto);
       await deleteProducto(producto.id);
     }
@@ -82,7 +83,11 @@ export default function ProductosPage() {
         onPageChange={setPage}
       /> */}
 
-      {error && <Box color="error.main" mt={2}>Error: {error}</Box>}
+      {error && (
+        <Box color="error.main" mt={2}>
+          Error: {error}
+        </Box>
+      )}
 
       <ProductoDialog
         open={openDialog}
