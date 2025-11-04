@@ -1,38 +1,74 @@
 export interface Venta {
   id: number;
-  cuota_mensual: number;
-  estado: string;
+  cliente: number | null;
+  cliente_nombre?: string;
   fecha: string;
-  interes: number;
-  plazo_meses: number;
-  tipo_venta: string;
-  total: number;
-  total_con_interes: number;
+  total: string;
+  tipo_pago: "contado" | "credito";
+  estado_pago: "pendiente" | "parcial" | "pagado";
+  interes?: string | null;
+  total_con_interes?: string | null;
+  plazo_meses?: number | null;
+  cuota_mensual?: string | null;
+  detalles?: DetalleVenta[];
 }
 
 export interface DetalleVenta {
   id: number;
-  cantidad: number;
-  precio_unitario: number;
-  subtotal: number;
-  venta: number;
   variante: number;
-  variante_detalle?: {
-    id: number;
-    talla: string;
-    color: string;
-    producto_nombre: string;
-    imagen_url?: string;
-  };
+  cantidad: number;
+  precio_unitario: string;
+  subtotal: string;
+  producto_nombre: string;
+  talla: string;
+  color: string;
 }
 
 export interface Pago {
   id: number;
-  estado: string;
-  fecha: string;
-  metodo: string;
-  monto: number;
   venta: number;
+  cuota?: number | null;
+  cuota_numero?: number | null;
+  fecha_pago: string;
+  monto_pagado: string;
+  metodo_pago: "efectivo" | "tarjeta" | "qr" | "transferencia";
+  referencia_pago?: string | null;
+}
+
+export interface PagarAlContadoRequest {
+  metodo_pago: "efectivo" | "tarjeta" | "qr" | "transferencia";
+  referencia_pago?: string;
+}
+
+export interface PagarAlContadoResponse {
+  message: string;
+  pago: Pago;
+  venta: Venta;
+}
+
+export interface PagarCuotaRequest {
+  cuota: number;
+  metodo_pago: "efectivo" | "tarjeta" | "qr" | "transferencia";
+  referencia_pago?: string;
+}
+
+export interface PagarCuotaResponse {
+  message: string;
+  pago: Pago;
+}
+
+export interface RegistrarPagoRequest {
+  venta: number;
+  monto_pagado: number;
+  metodo_pago: "efectivo" | "tarjeta" | "qr" | "transferencia";
+  cuota?: number;
+  referencia_pago?: string;
+}
+
+export interface RegistrarPagoResponse {
+  message: string;
+  pago: Pago;
+  venta: Venta;
 }
 
 export interface ItemCarritoVenta {
@@ -48,17 +84,54 @@ export interface ItemCarritoVenta {
 }
 
 export interface CrearVentaRequest {
-  tipo_venta: string;
-  estado: string;
+  cliente?: number | null;
+  tipo_pago: "contado" | "credito";
   items: {
     variante_id: number;
     cantidad: number;
-    precio_unitario: number;
   }[];
-  pago?: {
-    metodo: string;
-    monto: number;
-  };
-  plazo_meses?: number;
   interes?: number;
+  plazo_meses?: number;
+}
+
+export interface AgregarDetalleRequest {
+  variante: number;
+  cantidad: number;
+  precio_unitario?: number;
+}
+
+export interface ActualizarDetalleRequest {
+  cantidad?: number;
+  precio_unitario?: number;
+}
+
+// ============ CUOTAS ============
+
+export interface Cuota {
+  id: number;
+  venta: number;
+  venta_id: number;
+  cliente_nombre: string;
+  numero_cuota: number;
+  fecha_vencimiento: string;
+  monto_cuota: string;
+  estado: "pendiente" | "pagada" | "vencida";
+  estado_display: string;
+  fecha_pago: string | null;
+  esta_vencida: boolean;
+}
+
+export interface CuotasResponse {
+  count: number;
+  cuotas: Cuota[];
+  dias?: number;
+}
+
+export interface MarcarPagadaRequest {
+  fecha_pago?: string;
+}
+
+export interface MarcarPagadaResponse {
+  message: string;
+  cuota: Cuota;
 }

@@ -10,12 +10,17 @@ import {
   Box,
   Typography,
   MenuItem,
-  InputAdornment,
   Divider,
+  Alert,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  FormLabel,
 } from "@mui/material";
 import { useCarritoVentaStore } from "@/store/carritoVentaStore";
 import { ventaService } from "@/services/ventaService";
-import { CrearVentaRequest } from "@/types/ventas";
+import { pagoService } from "@/services/pagoService";
+import type { CrearVentaRequest } from "@/types/venta.types";
 
 interface Props {
   open: boolean;
@@ -23,66 +28,128 @@ interface Props {
   onSuccess: () => void;
 }
 
-const METODOS_PAGO = [
-  { value: "Efectivo", label: "Efectivo" },
-  { value: "Tarjeta", label: "Tarjeta de Crédito/Débito" },
-  { value: "QR", label: "Código QR" },
-  { value: "Transferencia", label: "Transferencia Bancaria" },
+const TIPOS_PAGO = [
+  { value: "contado", label: "Contado" },
+  { value: "credito", label: "Crédito" },
 ];
 
-const TIPOS_VENTA = [
-  { value: "Contado", label: "Contado" },
-  { value: "Credito", label: "Crédito" },
+const METODOS_PAGO = [
+  { value: "efectivo", label: "💵 Efectivo" },
+  { value: "tarjeta", label: "💳 Tarjeta" },
+  { value: "qr", label: "📱 Código QR" },
+  { value: "transferencia", label: "🏦 Transferencia" },
 ];
 
 const CobrarVentaDialog = ({ open, onClose, onSuccess }: Props) => {
   const { items, getTotal, clearCarrito } = useCarritoVentaStore();
-  const [descuento, setDescuento] = useState(0);
-  const [metodoPago, setMetodoPago] = useState("Efectivo");
-  const [tipoVenta, setTipoVenta] = useState("Contado");
+  const [tipoPago, setTipoPago] = useState<"contado" | "credito">("contado");
+  const [metodoPago, setMetodoPago] = useState<
+    "efectivo" | "tarjeta" | "qr" | "transferencia"
+  >("efectivo");
+  const [referenciaPago, setReferenciaPago] = useState("");
   const [plazoMeses, setPlazoMeses] = useState(1);
   const [interes, setInteres] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const subtotal = getTotal();
-  const totalConDescuento = subtotal - descuento;
-  const totalConInteres = tipoVenta === "Credito" 
-    ? totalConDescuento * (1 + interes / 100)
-    : totalConDescuento;
+
+  // Calcular total con interés si es crédito
+  const totalConInteres =
+    tipoPago === "credito" ? subtotal * (1 + interes / 100) : subtotal;
+
+  const cuotaMensual =
+    tipoPago === "credito" ? totalConInteres / plazoMeses : 0;
 
   const handleConfirmarVenta = async () => {
     try {
       setLoading(true);
+      setError(null);
 
+      // Validar que haya items
+      if (items.length === 0) {
+        setError("El carrito está vacío");
+        return;
+      }
+
+      // Preparar datos según el nuevo formato del backend
       const ventaData: CrearVentaRequest = {
-        tipo_venta: tipoVenta,
-        estado: "Completada",
+        tipo_pago: tipoPago,
         items: items.map((item) => ({
           variante_id: item.variante_id,
           cantidad: item.cantidad,
-          precio_unitario: item.precio_unitario,
         })),
-        pago: {
-          metodo: metodoPago,
-          monto: totalConInteres,
-        },
       };
 
-      if (tipoVenta === "Credito") {
-        ventaData.plazo_meses = plazoMeses;
+      // Si es crédito, agregar campos adicionales
+      if (tipoPago === "credito") {
+        if (interes <= 0 || plazoMeses <= 0) {
+          setError(
+            "Para ventas a crédito, debes especificar interés y plazo válidos"
+          );
+          return;
+        }
         ventaData.interes = interes;
+        ventaData.plazo_meses = plazoMeses;
       }
 
-      await ventaService.create(ventaData);
+      // Cliente null para venta anónima
+      ventaData.cliente = null;
+
+      // Paso 1: Crear venta
+      const venta = await ventaService.crear(ventaData);
+      console.log("✅ Venta creada:", venta);
+
+      // Paso 2: Si es al contado, registrar pago inmediato
+      if (tipoPago === "contado") {
+        const pagoResult = await pagoService.pagarAlContado(venta.id, {
+          metodo_pago: metodoPago,
+          referencia_pago: referenciaPago || undefined,
+        });
+
+        console.log("✅ Pago registrado:", pagoResult);
+
+        alert(
+          `✅ Venta completada y pagada\n\n` +
+            `Total: Bs ${parseFloat(venta.total).toFixed(2)}\n` +
+            `Método: ${pagoService.formatearMetodoPago(metodoPago)}\n` +
+            `${referenciaPago ? `Ref: ${referenciaPago}` : ""}`
+        );
+      } else {
+        // Venta a crédito: solo confirmar creación
+        alert(
+          `✅ Venta a crédito registrada\n\n` +
+            `Total con interés: Bs ${parseFloat(
+              venta.total_con_interes || venta.total
+            ).toFixed(2)}\n` +
+            `${plazoMeses} cuotas de Bs ${parseFloat(
+              venta.cuota_mensual || "0"
+            ).toFixed(2)}`
+        );
+      }
 
       // Limpiar carrito y cerrar
       clearCarrito();
-      alert("Venta registrada exitosamente");
       onSuccess();
       onClose();
-    } catch (error) {
-      console.error("Error al registrar venta:", error);
-      alert("Error al registrar la venta. Por favor, intenta nuevamente.");
+
+      // Reset form
+      setTipoPago("contado");
+      setMetodoPago("efectivo");
+      setReferenciaPago("");
+      setInteres(0);
+      setPlazoMeses(1);
+    } catch (err: any) {
+      console.error("Error al procesar venta:", err);
+
+      // Manejar errores específicos del backend
+      const errorMessage =
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        err.message ||
+        "Error al procesar la venta. Por favor, intenta nuevamente.";
+
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -93,6 +160,13 @@ const CobrarVentaDialog = ({ open, onClose, onSuccess }: Props) => {
       <DialogTitle>💵 Cobrar Venta</DialogTitle>
       <DialogContent>
         <Box display="flex" flexDirection="column" gap={2} mt={1}>
+          {/* Mostrar error si existe */}
+          {error && (
+            <Alert severity="error" onClose={() => setError(null)}>
+              {error}
+            </Alert>
+          )}
+
           {/* Subtotal */}
           <Box display="flex" justifyContent="space-between">
             <Typography variant="body1">Subtotal:</Typography>
@@ -101,71 +175,88 @@ const CobrarVentaDialog = ({ open, onClose, onSuccess }: Props) => {
             </Typography>
           </Box>
 
-          {/* Descuento */}
-          <TextField
-            label="Descuento"
-            type="number"
-            fullWidth
-            value={descuento}
-            onChange={(e) => setDescuento(Math.max(0, parseFloat(e.target.value) || 0))}
-            InputProps={{
-              startAdornment: <InputAdornment position="start">Bs</InputAdornment>,
-            }}
-          />
-
           <Divider />
 
-          {/* Tipo de Venta */}
+          {/* Tipo de Pago */}
           <TextField
             select
-            label="Tipo de Venta"
+            label="Tipo de Pago"
             fullWidth
-            value={tipoVenta}
-            onChange={(e) => setTipoVenta(e.target.value)}
+            value={tipoPago}
+            onChange={(e) =>
+              setTipoPago(e.target.value as "contado" | "credito")
+            }
           >
-            {TIPOS_VENTA.map((tipo) => (
+            {TIPOS_PAGO.map((tipo) => (
               <MenuItem key={tipo.value} value={tipo.value}>
                 {tipo.label}
               </MenuItem>
             ))}
           </TextField>
 
+          {/* Método de Pago (solo para contado) */}
+          {tipoPago === "contado" && (
+            <Box>
+              <FormLabel component="legend">Método de Pago</FormLabel>
+              <RadioGroup
+                value={metodoPago}
+                onChange={(e) => setMetodoPago(e.target.value as any)}
+              >
+                {METODOS_PAGO.map((metodo) => (
+                  <FormControlLabel
+                    key={metodo.value}
+                    value={metodo.value}
+                    control={<Radio />}
+                    label={metodo.label}
+                  />
+                ))}
+              </RadioGroup>
+
+              <TextField
+                label="Referencia de Pago (opcional)"
+                fullWidth
+                value={referenciaPago}
+                onChange={(e) => setReferenciaPago(e.target.value)}
+                helperText="Ej: Número de ticket, voucher, transacción"
+                margin="normal"
+              />
+            </Box>
+          )}
+
           {/* Campos adicionales para crédito */}
-          {tipoVenta === "Credito" && (
+          {tipoPago === "credito" && (
             <>
+              <Alert severity="info">
+                Las ventas a crédito requieren especificar el interés y plazo en
+                meses. Los pagos se realizarán posteriormente.
+              </Alert>
+
               <Box display="flex" gap={2}>
-                <TextField
-                  label="Plazo (meses)"
-                  type="number"
-                  fullWidth
-                  value={plazoMeses}
-                  onChange={(e) => setPlazoMeses(Math.max(1, parseInt(e.target.value) || 1))}
-                />
                 <TextField
                   label="Interés (%)"
                   type="number"
                   fullWidth
+                  required
                   value={interes}
-                  onChange={(e) => setInteres(Math.max(0, parseFloat(e.target.value) || 0))}
+                  onChange={(e) =>
+                    setInteres(Math.max(0, parseFloat(e.target.value) || 0))
+                  }
+                  helperText="Ej: 15 para 15%"
+                />
+                <TextField
+                  label="Plazo (meses)"
+                  type="number"
+                  fullWidth
+                  required
+                  value={plazoMeses}
+                  onChange={(e) =>
+                    setPlazoMeses(Math.max(1, parseInt(e.target.value) || 1))
+                  }
+                  helperText="Número de cuotas"
                 />
               </Box>
             </>
           )}
-
-          {/* Método de Pago */}
-          <TextField
-            select
-            label="Método de Pago"
-            fullWidth
-            value={metodoPago}
-            onChange={(e) => setMetodoPago(e.target.value)}
-          >
-            {METODOS_PAGO.map((metodo) => (
-              <MenuItem key={metodo.value} value={metodo.value}>
-                {metodo.label}
-              </MenuItem>
-            ))}
-          </TextField>
 
           <Divider />
 
@@ -177,14 +268,25 @@ const CobrarVentaDialog = ({ open, onClose, onSuccess }: Props) => {
             </Typography>
           </Box>
 
-          {tipoVenta === "Credito" && (
-            <Box display="flex" justifyContent="space-between">
-              <Typography variant="body2" color="textSecondary">
-                Cuota mensual:
-              </Typography>
-              <Typography variant="body2" color="textSecondary">
-                Bs {(totalConInteres / plazoMeses).toFixed(2)}
-              </Typography>
+          {/* Información de crédito */}
+          {tipoPago === "credito" && interes > 0 && plazoMeses > 0 && (
+            <Box>
+              <Box display="flex" justifyContent="space-between" mb={1}>
+                <Typography variant="body2" color="textSecondary">
+                  Interés ({interes}%):
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  Bs {(totalConInteres - subtotal).toFixed(2)}
+                </Typography>
+              </Box>
+              <Box display="flex" justifyContent="space-between">
+                <Typography variant="body2" fontWeight={500}>
+                  Cuota mensual:
+                </Typography>
+                <Typography variant="body2" fontWeight={500} color="primary">
+                  Bs {cuotaMensual.toFixed(2)} × {plazoMeses} meses
+                </Typography>
+              </Box>
             </Box>
           )}
         </Box>
@@ -196,9 +298,13 @@ const CobrarVentaDialog = ({ open, onClose, onSuccess }: Props) => {
         <Button
           variant="contained"
           onClick={handleConfirmarVenta}
-          disabled={loading}
+          disabled={loading || items.length === 0}
         >
-          {loading ? "Procesando..." : "Confirmar Venta"}
+          {loading
+            ? "Procesando..."
+            : tipoPago === "contado"
+            ? "Confirmar y Pagar"
+            : "Confirmar Venta"}
         </Button>
       </DialogActions>
     </Dialog>

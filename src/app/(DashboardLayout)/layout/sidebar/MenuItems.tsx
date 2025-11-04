@@ -44,6 +44,20 @@ const Menuitems: MenuitemsType[] = [
 
   {
     id: uniqueId(),
+    title: "Ventas",
+    icon: "bill-list-line-duotone",
+    href: "/ventas",
+  },
+
+  {
+    id: uniqueId(),
+    title: "Reportes",
+    icon: "chart-2-line-duotone",
+    href: "/reportes",
+  },
+
+  {
+    id: uniqueId(),
     title: "Inventario",
     icon: "box-linear",
     href: "/productos",

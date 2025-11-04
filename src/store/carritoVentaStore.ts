@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { ItemCarritoVenta } from "@/types/ventas";
+import type { ItemCarritoVenta } from "@/types/venta.types";
 
 interface CarritoVentaState {
   items: ItemCarritoVenta[];
