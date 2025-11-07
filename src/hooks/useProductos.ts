@@ -1,7 +1,7 @@
 // src/hooks/useProductos.ts
 'use client';
 import { productoService } from '@/services/productoService';
-import { Producto } from '@/types/productos';
+import { Producto, ProductoVariante } from '@/types/productos';
 import { useState, useEffect } from 'react';
 
 
@@ -10,6 +10,8 @@ export const useProductos = () => {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [variantes, setVariantes] = useState<ProductoVariante[]>([]);
+  const [loadingVariantes, setLoadingVariantes] = useState(false);
 
   // Cargar productos
   const fetchProductos = async () => {
@@ -78,6 +80,23 @@ export const useProductos = () => {
     }
   };
 
+  // Obtener variantes de un producto
+  const fetchVariantes = async (productoId: number) => {
+    try {
+      setLoadingVariantes(true);
+      setError(null);
+      const data = await productoService.getVariantesByProducto(productoId);
+      console.log('Variantes del producto', productoId, data);
+      setVariantes(data);
+      return data;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error al cargar variantes');
+      throw err;
+    } finally {
+      setLoadingVariantes(false);
+    }
+  };
+
   // Cargar productos al montar el componente
   useEffect(() => {
     fetchProductos();
@@ -88,11 +107,14 @@ export const useProductos = () => {
     productos,
     loading,
     error,
+    variantes,
+    loadingVariantes,
     
     // Acciones
     createProducto,
     updateProducto,
     deleteProducto,
-    refetch: fetchProductos
+    refetch: fetchProductos,
+    fetchVariantes
   };
 };
