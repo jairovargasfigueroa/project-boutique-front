@@ -62,16 +62,16 @@ const ProductoDialog: React.FC<Props> = ({ open, mode, initialData, onClose, onS
             label="Precio"
             type="number"
             fullWidth
-            value={form.precio ?? ''}
-            onChange={e => handleChange('precio', parseFloat(e.target.value))}
+            value={form.precio_base ?? ''}
+            onChange={e => handleChange('precio_base', parseFloat(e.target.value))}
           />
-          <TextField
+          {/* <TextField
             label="Stock"
             type="number"
             fullWidth
             value={form.stock ?? ''}
             onChange={e => handleChange('stock', parseInt(e.target.value, 10))}
-          />
+          /> */}
           <TextField
             label="URL de Imagen"
             fullWidth

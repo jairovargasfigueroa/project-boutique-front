@@ -3,16 +3,18 @@ import Profile from './Profile';
 import { useEffect, useState, useContext } from 'react';
 import { Icon } from '@iconify/react';
 import { DashboardContext } from '@/app/context/DashboardContext';
-import { IconBellRinging } from "@tabler/icons-react";
+import { IconBellRinging, IconShoppingCart } from "@tabler/icons-react";
 import Notification from './Notification'
+import MiniCart from '@/components/common/Carrito/MiniCart'
+import useCartStore from '@/store/cartStore'
 
 const Header = () => {
   const [_height, setHeight] = useState('0px');
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-
-
-
-
+  const cantidadItems = useCartStore(state => 
+    state.items.reduce((sum, item) => sum + item.cantidad, 0)
+  )
 
   const AppBarStyled = styled(AppBar)(({ theme }) => ({
     boxShadow: 'none',
@@ -79,6 +81,16 @@ const Header = () => {
           <Box flexGrow={1} />
           <>
             <Stack spacing={2} direction="row" alignItems="center">
+              <IconButton 
+                color="inherit" 
+                onClick={() => setDrawerOpen(true)}
+                aria-label="carrito"
+              >
+                <Badge badgeContent={cantidadItems} color="primary">
+                  <IconShoppingCart size={22} />
+                </Badge>
+              </IconButton>
+              
               <Button variant="contained" color="primary" target="_blank" href="https://www.wrappixel.com/templates/spike-nextjs-admin-template/?ref=376#demos">
                 Check Pro Template
               </Button>
@@ -89,6 +101,11 @@ const Header = () => {
 
         </ToolbarStyled>
       </AppBarStyled>
+
+      <MiniCart 
+        open={drawerOpen} 
+        onClose={() => setDrawerOpen(false)} 
+      />
     </>
   );
 };

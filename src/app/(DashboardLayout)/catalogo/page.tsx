@@ -1,51 +1,50 @@
-// app/(DashboardLayout)/catalogo/page.tsx
-'use client';
-import React from 'react';
-import { Grid, Box, Typography } from '@mui/material';
-import { useProductos } from '@/hooks/useProductos';
+'use client'
 
-import { Producto } from '@/types/productos';
-import PageContainer from '../components/container/PageContainer';
-import ProductoCard from '@/components/common/ProductoCards/CatalogoProductoCard';
+import { Box } from '@mui/material'
+import { useRouter } from 'next/navigation'
+import useCartStore from '@/store/cartStore'
+import { useProductos } from '@/hooks/useProductos'
+import CatalogoProductoCard from './components/CatalogoProductoCard'
+import { Producto } from '@/types/productos'
 
 export default function CatalogoPage() {
-  const { productos, loading, error } = useProductos();
-
-  const handleAddToCart = (producto: Producto) => {
-    console.log('Añadir al carrito:', producto);
-    // Aquí irá tu lógica del carrito
-  };
-
-  if (loading) {
-    return <Typography>Cargando productos...</Typography>;
+  const router = useRouter()
+  const { productos, loading } = useProductos()
+  
+  // HANDLERS (Lógica aquí)
+  const handleClickCard = (producto: Producto) => {
+    router.push(`/producto/${producto.id}`)
   }
-
-  if (error) {
-    return <Typography color="error">Error: {error}</Typography>;
+  
+  const handleAgregarCarrito = (producto: Producto) => {
+    // Redirigir a detalle para seleccionar variante (talla/color)
+    router.push(`/producto/${producto.id}`)
   }
-
+  
+  if (loading) return <div>Cargando...</div>
+  
   return (
-    <PageContainer title="Catálogo" description="Catálogo de productos">
-      <Box>
-        <Typography variant="h4" mb={3}>
-          Catálogo de Boutique
-        </Typography>
-        
-        <Grid container spacing={3}>
-          {productos.map((producto) => (
-            <Grid
-              key={producto.id}
-              size={{ xs: 12, md: 4, lg: 3 }}
-            >
-              <ProductoCard
-                producto={producto}
-                onAddToCart={handleAddToCart}
-                linkUrl={`/catalogo/${producto.id}`}
-              />
-            </Grid>
-          ))}
-        </Grid>
+    <Box sx={{ p: 3 }}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            sm: 'repeat(2, 1fr)',
+            md: 'repeat(3, 1fr)',
+          },
+          gap: 3,
+        }}
+      >
+        {productos.map(producto => (
+          <CatalogoProductoCard
+            key={producto.id}
+            producto={producto}
+            onClickCard={handleClickCard}
+            onAgregarCarrito={handleAgregarCarrito}
+          />
+        ))}
       </Box>
-    </PageContainer>
-  );
+    </Box>
+  )
 }
