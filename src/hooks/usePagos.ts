@@ -1,51 +1,64 @@
-'use client';
-import { useState } from 'react';
-import { pagoService } from '@/services/pagoService';
-import { CrearPagoData, Pago } from '@/types/pagos';
+import { useState, useEffect } from "react";
+import type { Pago, PagarCuotaRequest } from "@/types/pago.types";
+import { pagoService } from "@/services/pagoService";
 
-export const usePagos = () => {
-  const [pago, setPago] = useState<Pago | null>(null);
+export const usePagos = (ventaId?: number) => {
+  const [pagos, setPagos] = useState<Pago[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const registrarPago = async (data: CrearPagoData) => {
+  const cargarPagos = async () => {
+    if (!ventaId) return;
+
     try {
       setLoading(true);
       setError(null);
-      const nuevoPago = await pagoService.crear(data);
-      console.log('Pago registrado:', nuevoPago);
-      setPago(nuevoPago);
-      return nuevoPago;
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Error al registrar pago';
-      setError(errorMsg);
-      throw err;
+      const data = await pagoService.getPagosByVenta(ventaId);
+      setPagos(data);
+    } catch (err: any) {
+      console.error("Error al cargar pagos:", err);
+      setError(err.response?.data?.error || "Error al cargar pagos");
     } finally {
       setLoading(false);
     }
   };
 
-  const obtenerPago = async (id: number) => {
+  useEffect(() => {
+    if (ventaId) {
+      cargarPagos();
+    }
+  }, [ventaId]);
+
+  return {
+    pagos,
+    loading,
+    error,
+    refetch: cargarPagos,
+  };
+};
+
+export const usePagarCuota = () => {
+  const [procesando, setProcesando] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const pagarCuota = async (request: PagarCuotaRequest) => {
     try {
-      setLoading(true);
+      setProcesando(true);
       setError(null);
-      const data = await pagoService.getById(id);
-      setPago(data);
-      return data;
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Error al obtener pago';
+      const result = await pagoService.pagarCuota(request);
+      return result;
+    } catch (err: any) {
+      const errorMsg = err.response?.data?.error || "Error al procesar el pago";
       setError(errorMsg);
-      throw err;
+      throw new Error(errorMsg);
     } finally {
-      setLoading(false);
+      setProcesando(false);
     }
   };
 
   return {
-    pago,
-    loading,
+    pagarCuota,
+    procesando,
     error,
-    registrarPago,
-    obtenerPago
   };
 };

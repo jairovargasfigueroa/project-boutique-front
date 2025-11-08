@@ -1,5 +1,5 @@
-'use client';
-import React, { useState, useEffect } from 'react';
+"use client";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -7,27 +7,44 @@ import {
   DialogActions,
   Button,
   TextField,
-  Box
-} from '@mui/material';
-import { Producto } from '@/types/productos';
+  Box,
+  MenuItem,
+  InputAdornment,
+  CircularProgress,
+} from "@mui/material";
+import { Producto } from "@/types/productos";
+import { useCategorias } from "@/hooks/useCategorias";
 
 interface Props {
   open: boolean;
-  mode: 'create' | 'edit';
+  mode: "create" | "edit";
   initialData: Partial<Producto>;
   onClose: () => void;
   onSubmit: (data: Partial<Producto>) => Promise<void>;
 }
 
-const ProductoDialog: React.FC<Props> = ({ open, mode, initialData, onClose, onSubmit }) => {
+const GENEROS = [
+  { value: "Hombre", label: "Hombre" },
+  { value: "Mujer", label: "Mujer" },
+  { value: "Unisex", label: "Unisex" },
+];
+
+const ProductoDialog: React.FC<Props> = ({
+  open,
+  mode,
+  initialData,
+  onClose,
+  onSubmit,
+}) => {
   const [form, setForm] = useState<Partial<Producto>>(initialData);
+  const { categorias, loading: loadingCategorias } = useCategorias();
 
   useEffect(() => {
     setForm(initialData);
   }, [initialData]);
 
   const handleChange = (field: keyof Producto, value: any) => {
-    setForm(prev => ({ ...prev, [field]: value }));
+    setForm((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSave = async () => {
@@ -36,54 +53,107 @@ const ProductoDialog: React.FC<Props> = ({ open, mode, initialData, onClose, onS
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>{mode === 'create' ? 'Crear nuevo producto' : 'Editar producto'}</DialogTitle>
+      <DialogTitle>
+        {mode === "create" ? "Crear nuevo producto" : "Editar producto"}
+      </DialogTitle>
       <DialogContent>
         <Box display="flex" flexDirection="column" gap={2} mt={1}>
           <TextField
             label="Nombre"
             fullWidth
-            value={form.nombre || ''}
-            onChange={e => handleChange('nombre', e.target.value)}
+            value={form.nombre || ""}
+            onChange={(e) => handleChange("nombre", e.target.value)}
+            required
           />
 
           <TextField
-            label="Descripcion"
+            label="Descripción"
             fullWidth
-            value={form.descripcion || ''}
-            onChange={e => handleChange('descripcion', e.target.value)}
+            multiline
+            rows={3}
+            value={form.descripcion || ""}
+            onChange={(e) => handleChange("descripcion", e.target.value)}
           />
-          <TextField
-            label="Categoría"
-            fullWidth
-            value={form.categoria || ''}
-            onChange={e => handleChange('categoria', e.target.value)}
-          />
-          <TextField
-            label="Precio"
-            type="number"
-            fullWidth
-            value={form.precio_base ?? ''}
-            onChange={e => handleChange('precio_base', parseFloat(e.target.value))}
-          />
-          {/* <TextField
-            label="Stock"
-            type="number"
-            fullWidth
-            value={form.stock ?? ''}
-            onChange={e => handleChange('stock', parseInt(e.target.value, 10))}
-          /> */}
+
+          <Box display="flex" gap={2}>
+            <TextField
+              select
+              label="Categoría"
+              fullWidth
+              value={form.categoria || ""}
+              onChange={(e) => handleChange("categoria", parseInt(e.target.value))}
+              disabled={loadingCategorias}
+              required
+            >
+              {loadingCategorias ? (
+                <MenuItem disabled>
+                  <CircularProgress size={20} />
+                </MenuItem>
+              ) : (
+                categorias.map((cat) => (
+                  <MenuItem key={cat.id} value={cat.id}>
+                    {cat.nombre}
+                  </MenuItem>
+                ))
+              )}
+            </TextField>
+
+            <TextField
+              select
+              label="Género"
+              fullWidth
+              value={form.genero || ""}
+              onChange={(e) => handleChange("genero", e.target.value)}
+              required
+            >
+              {GENEROS.map((genero) => (
+                <MenuItem key={genero.value} value={genero.value}>
+                  {genero.label}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Box>
+
+          <Box display="flex" gap={2}>
+            <TextField
+              label="Precio Base"
+              fullWidth
+              type="number"
+              value={form.precio_base || ""}
+              onChange={(e) =>
+                handleChange("precio_base", parseFloat(e.target.value))
+              }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">$</InputAdornment>
+                ),
+              }}
+              required
+            />
+
+            <TextField
+              label="Stock"
+              fullWidth
+              type="number"
+              value={form.stock || 0}
+              onChange={(e) => handleChange("stock", parseInt(e.target.value))}
+              required
+            />
+          </Box>
+
           <TextField
             label="URL de Imagen"
             fullWidth
-            value={form.imagen || ''}
-            onChange={e => handleChange('imagen', e.target.value)}
+            value={form.imagen_url || ""}
+            onChange={(e) => handleChange("imagen_url", e.target.value)}
+            placeholder="https://ejemplo.com/imagen.jpg"
           />
         </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancelar</Button>
         <Button variant="contained" onClick={handleSave}>
-          {mode === 'create' ? 'Crear' : 'Actualizar'}
+          {mode === "create" ? "Crear" : "Actualizar"}
         </Button>
       </DialogActions>
     </Dialog>
