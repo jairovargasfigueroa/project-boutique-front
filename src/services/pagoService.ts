@@ -1,4 +1,5 @@
 import { apiClient } from "./apiBase";
+import { CrearPagoData, Pago } from '@/types/pagos';
 import type {
   Pago,
   PagarAlContadoRequest,
@@ -8,6 +9,8 @@ import type {
   RegistrarPagoRequest,
   RegistrarPagoResponse,
 } from "@/types/pago.types";
+const ENDPOINT = '/pagos/';
+
 export const pagoService = {
   pagarAlContado: async (
     ventaId: number,
@@ -51,7 +54,15 @@ export const pagoService = {
     const response = await apiClient.get<Pago>(`/pagos/${id}/`);
     return response.data;
   },
+  crear: async (data: CrearPagoData) => {
+    const response = await apiClient.post<Pago>(ENDPOINT, data);
+    return response.data;
+  },
 
+  getByVenta: async (ventaId: number) => {
+    const response = await apiClient.get<Pago[]>(`${ENDPOINT}?venta=${ventaId}`);
+    return response.data;
+  }
   calcularTotalPagado: (pagos: Pago[]): number => {
     return pagos.reduce((sum, pago) => sum + parseFloat(pago.monto_pagado), 0);
   },

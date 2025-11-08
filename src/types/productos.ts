@@ -12,9 +12,9 @@ export interface Producto {
 
 export interface ProductoVariante {
   id: number;
-  talla: string;
-  color: string;
-  precio_venta: number;
+  talla?: string | null;
+  color?: string | null;
+  precio_venta?: number;
   precio_costo?: number;
   stock: number;
   stock_minimo?: number;

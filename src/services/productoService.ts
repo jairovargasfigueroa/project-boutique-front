@@ -1,8 +1,9 @@
-import { Producto } from "@/types/productos";
-import { apiClient } from "./apiBase";
+import { Producto, ProductoVariante } from '@/types/productos';
+import { apiClient } from './apiBase';
 // asegúrate que esta ruta sea correcta
 
-const ENDPOINT = "/productos/";
+const ENDPOINT = '/productos/';
+const VARIANTE_ENDPOINT = '/variantes/';
 
 export const productoService = {
   getAll: async () => {
@@ -53,6 +54,12 @@ export const productoService = {
 
   getFeatured: async () => {
     const response = await apiClient.get<Producto[]>(`${ENDPOINT}destacados`);
+    return response.data;
+  },
+
+  // Obtener variantes de un producto específico
+  getVariantesByProducto: async (productoId: number) => {
+    const response = await apiClient.get<ProductoVariante[]>(`${ENDPOINT}${productoId}/variantes`);
     return response.data;
   },
 };

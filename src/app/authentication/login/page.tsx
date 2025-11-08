@@ -5,8 +5,11 @@ import { Grid, Box, Card, Stack, Typography } from '@mui/material'
 import PageContainer from '@/app/(DashboardLayout)/components/container/PageContainer'
 import Logo from '@/app/(DashboardLayout)/layout/shared/logo/Logo'
 import AuthLogin from '../auth/AuthLogin'
+import useAuthStore from '@/store/authStore'
 
 const Login2 = () => {
+
+  
   return (
     <PageContainer title='Login' description='this is Login page'>
       <Box
