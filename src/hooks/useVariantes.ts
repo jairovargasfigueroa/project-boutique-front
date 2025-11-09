@@ -1,7 +1,11 @@
 // src/hooks/useVariantes.ts
 "use client";
 import { varianteService } from "@/services/varianteService";
-import { ProductoVariante } from "@/types/productos";
+import { 
+  ProductoVariante, 
+  VarianteProductoCreate, 
+  VarianteProductoUpdate 
+} from "@/types/productos";
 import { useState, useEffect } from "react";
 
 interface UseVariantesProps {
@@ -28,7 +32,7 @@ export const useVariantes = ({
         ? data.filter((v) => v.producto === productoId)
         : data;
 
-      console.log("Variantes", filteredData);
+      console.log("Variantes cargadas:", filteredData);
       setVariantes(filteredData);
       return filteredData;
     } catch (err) {
@@ -41,13 +45,11 @@ export const useVariantes = ({
     }
   };
 
-  const createVariante = async (data: Omit<ProductoVariante, "id">) => {
+  const createVariante = async (data: VarianteProductoCreate) => {
     try {
       setLoading(true);
       setError(null);
-      const newVariante = await varianteService.create(
-        data as ProductoVariante
-      );
+      const newVariante = await varianteService.create(data);
       setVariantes((prev) => [...prev, newVariante]);
       return newVariante;
     } catch (err) {
@@ -60,15 +62,13 @@ export const useVariantes = ({
 
   const updateVariante = async (
     id: number,
-    data: Partial<ProductoVariante>
+    data: VarianteProductoUpdate
   ) => {
     try {
       setLoading(true);
       setError(null);
-      const updatedVariante = await varianteService.update(
-        id,
-        data as ProductoVariante
-      );
+      // Usar PATCH para actualización parcial (más seguro)
+      const updatedVariante = await varianteService.patch(id, data);
       setVariantes((prev) =>
         prev.map((v) => (v.id === id ? updatedVariante : v))
       );

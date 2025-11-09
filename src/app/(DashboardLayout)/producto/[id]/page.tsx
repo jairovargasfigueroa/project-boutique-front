@@ -39,10 +39,8 @@ export default function ProductoDetallePage() {
   
   // Establecer imagen inicial
   useEffect(() => {
-    if (producto?.imagen) {
-      setImagenActual(producto.imagen)
-    } else if (variantes.length > 0 && variantes[0].imagen) {
-      setImagenActual(variantes[0].imagen)
+    if (producto?.image) {
+      setImagenActual(producto.image)
     } else {
       setImagenActual('https://placehold.co/600x500')
     }
@@ -58,7 +56,10 @@ export default function ProductoDetallePage() {
     ? variantes.find(v => v.talla === tallaSeleccionada)
     : variantes[0]
   
-  const precioMostrar = varianteActual?.precio_venta || producto?.precio_base || 0
+  // Convertir precio a número si viene como string
+  const precioMostrar = varianteActual?.precio 
+    ? (typeof varianteActual.precio === 'string' ? parseFloat(varianteActual.precio) : varianteActual.precio)
+    : 0
   const stockMostrar = varianteActual?.stock || 0
   
   const handleSeleccionarTalla = (talla: string) => {
@@ -73,11 +74,10 @@ export default function ProductoDetallePage() {
     router.push('/carrito')
   }
   
-  // Obtener imágenes para la galería
+  // Obtener imágenes para la galería (ahora solo la imagen del producto)
   const imagenesGaleria = [
-    producto?.imagen,
-    ...variantes.map(v => v.imagen).filter(Boolean)
-  ].filter((img, index, self) => img && self.indexOf(img) === index) as string[]
+    producto?.image,
+  ].filter(Boolean) as string[]
   
   if (loadingVariantes) {
     return (

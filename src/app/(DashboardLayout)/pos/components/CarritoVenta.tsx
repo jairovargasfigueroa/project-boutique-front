@@ -29,7 +29,7 @@ const CarritoVenta = ({ onCobrar }: Props) => {
   // Configuración de columnas
   const columns = [
     {
-      key: "imagen_url",
+      key: "image",
       label: "Imagen",
       align: "center" as const,
       width: "80px",

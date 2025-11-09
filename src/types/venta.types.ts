@@ -49,11 +49,10 @@ export interface ActualizarDetalleRequest {
 export interface ItemCarritoVenta {
   variante_id: number;
   producto_nombre: string;
-  talla: string;
-  color: string;
-  precio_unitario: number;
+  talla: string | null;
+  precio_unitario: number | string;
   cantidad: number;
-  subtotal: number;
-  imagen_url?: string;
+  subtotal?: number;
+  image?: string | null;
   stock_disponible: number;
 }

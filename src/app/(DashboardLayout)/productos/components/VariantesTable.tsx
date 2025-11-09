@@ -17,7 +17,7 @@ import {
   Avatar,
 } from "@mui/material";
 import { Edit, Delete, Add } from "@mui/icons-material";
-import { ProductoVariante } from "@/types/productos";
+import { ProductoVariante, VarianteProductoCreate, VarianteProductoUpdate } from "@/types/productos";
 import { useVariantes } from "@/hooks/useVariantes";
 import VarianteDialog from "./VarianteDialog";
 
@@ -38,31 +38,36 @@ const VariantesTable = ({ productoId }: Props) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<"create" | "edit">("create");
   const [selectedVariante, setSelectedVariante] = useState<
-    Partial<ProductoVariante>
-  >({});
+    VarianteProductoCreate | VarianteProductoUpdate | undefined
+  >(undefined);
+  const [editingVarianteId, setEditingVarianteId] = useState<number | null>(null);
 
   useEffect(() => {
     refetch(productoId);
   }, [productoId]);
 
   const handleCreate = () => {
-    setSelectedVariante({});
+    setSelectedVariante(undefined);
+    setEditingVarianteId(null);
     setDialogMode("create");
     setDialogOpen(true);
   };
 
   const handleEdit = (variante: ProductoVariante) => {
-    setSelectedVariante(variante);
+    const varianteUpdate: VarianteProductoUpdate = {
+      talla: variante.talla,
+      precio: typeof variante.precio === 'string' ? parseFloat(variante.precio) : variante.precio,
+      stock: variante.stock,
+      stock_minimo: variante.stock_minimo,
+    };
+    setSelectedVariante(varianteUpdate);
+    setEditingVarianteId(variante.id);
     setDialogMode("edit");
     setDialogOpen(true);
   };
 
   const handleDelete = async (variante: ProductoVariante) => {
-    if (
-      window.confirm(
-        `¿Eliminar la variante ${variante.talla} - ${variante.color}?`
-      )
-    ) {
+    if (window.confirm(`¿Eliminar la variante ${variante.talla} ?`)) {
       try {
         await deleteVariante(variante.id);
       } catch (error) {
@@ -71,14 +76,15 @@ const VariantesTable = ({ productoId }: Props) => {
     }
   };
 
-  const handleSubmit = async (data: Partial<ProductoVariante>) => {
+  const handleSubmit = async (data: VarianteProductoCreate | VarianteProductoUpdate) => {
     try {
       if (dialogMode === "create") {
-        await createVariante(data as Omit<ProductoVariante, "id">);
-      } else if (selectedVariante.id) {
-        await updateVariante(selectedVariante.id, data);
+        await createVariante(data as VarianteProductoCreate);
+      } else if (editingVarianteId) {
+        await updateVariante(editingVarianteId, data as VarianteProductoUpdate);
       }
       setDialogOpen(false);
+      setEditingVarianteId(null);
       refetch(productoId);
     } catch (error) {
       console.error("Error al guardar:", error);
@@ -136,25 +142,19 @@ const VariantesTable = ({ productoId }: Props) => {
               {variantes.map((variante) => (
                 <TableRow key={variante.id}>
                   <TableCell>
-                    <Chip label={variante.talla} size="small" />
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={variante.color}
-                      size="small"
-                      sx={{
-                        backgroundColor: variante.color.toLowerCase(),
-                        color: "#fff",
-                      }}
-                    />
+                    <Chip label={variante.talla || "Sin talla"} size="small" />
                   </TableCell>
 
                   <TableCell align="right">
-                    ${variante.precio_venta?.toFixed(2) || "-"}
+                    {variante.precio 
+                      ? `Bs. ${(typeof variante.precio === 'string' 
+                          ? parseFloat(variante.precio) 
+                          : variante.precio
+                        ).toFixed(2)}`
+                      : "-"
+                    }
                   </TableCell>
-                  <TableCell align="right">
-                    ${variante.precio_costo?.toFixed(2) || "-"}
-                  </TableCell>
+
                   <TableCell align="center">
                     <Chip
                       label={variante.stock}

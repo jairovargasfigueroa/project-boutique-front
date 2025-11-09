@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Box } from "@mui/material";
 import { useProductos } from "@/hooks/useProductos";
-import { Producto } from "@/types/productos";
+import { Producto, ProductoCreate, ProductoUpdate } from "@/types/productos";
 import ProductosTable from "./components/ProductosTable";
 import ProductoDialog from "./components/ProductoDialog";
 
@@ -34,11 +34,11 @@ export default function ProductosPage() {
     setOpenDialog(true);
   };
 
-  const handleSubmit = async (data: Partial<Producto>) => {
+  const handleSubmit = async (data: ProductoCreate | ProductoUpdate) => {
     if (modo === "create") {
-      await createProducto(data);
+      await createProducto(data as ProductoCreate);
     } else if (productoSeleccionado) {
-      await updateProducto(productoSeleccionado.id, data);
+      await updateProducto(productoSeleccionado.id, data as ProductoUpdate);
     }
     setOpenDialog(false);
     refetch();
@@ -92,7 +92,17 @@ export default function ProductosPage() {
       <ProductoDialog
         open={openDialog}
         mode={modo}
-        initialData={productoSeleccionado || {}}
+        initialData={
+          productoSeleccionado
+            ? {
+                nombre: productoSeleccionado.nombre,
+                descripcion: productoSeleccionado.descripcion,
+                genero: productoSeleccionado.genero,
+                marca: productoSeleccionado.marca,
+                categoria: productoSeleccionado.categoria,
+              }
+            : undefined
+        }
         onClose={() => setOpenDialog(false)}
         onSubmit={handleSubmit}
       />

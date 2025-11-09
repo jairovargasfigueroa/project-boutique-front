@@ -32,7 +32,7 @@ export default function POSPage() {
   const productosFiltrados = productos.filter(
     (p) =>
       p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-      p.categoria_nombre.toLowerCase().includes(busqueda.toLowerCase())
+      (p.categoria_nombre?.toLowerCase().includes(busqueda.toLowerCase()) ?? false)
   );
 
   // Abrir dialog de variantes
@@ -98,7 +98,7 @@ export default function POSPage() {
                         component="img"
                         sx={{ width: 120, objectFit: "cover" }}
                         image={
-                          producto.imagen_url || "/images/products/default.jpg"
+                          producto.image || "/images/products/default.jpg"
                         }
                         alt={producto.nombre}
                       />
@@ -120,15 +120,11 @@ export default function POSPage() {
                           display="flex"
                           justifyContent="space-between"
                           alignItems="center"
+                          mt={1}
                         >
-                          <Box>
-                            <Typography variant="body2" color="textSecondary">
-                              Desde:
-                            </Typography>
-                            <Typography variant="h6" color="primary">
-                              Bs {producto.precio_base.toFixed(2)}
-                            </Typography>
-                          </Box>
+                          <Typography variant="body2" color="textSecondary">
+                            Stock: {producto.stock || 0} unidades
+                          </Typography>
                           <Button
                             variant="contained"
                             startIcon={<Visibility />}

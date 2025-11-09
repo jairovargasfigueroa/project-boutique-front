@@ -46,15 +46,14 @@ const SeleccionarVarianteDialog = ({ open, onClose, producto }: Props) => {
       variante_id: variante.id,
       producto_nombre: producto.nombre,
       talla: variante.talla,
-      color: variante.color,
-      precio_unitario: variante.precio_venta,
+      precio_unitario: typeof variante.precio === 'string' ? parseFloat(variante.precio) : variante.precio,
       cantidad: 1,
-      imagen_url: producto.imagen_url,
+      image: producto.image,
       stock_disponible: variante.stock,
     });
 
     alert(
-      `${producto.nombre} ${variante.talla} - ${variante.color} agregado al carrito`
+      `${producto.nombre} ${variante.talla || 'Sin talla'} agregado al carrito`
     );
   };
 

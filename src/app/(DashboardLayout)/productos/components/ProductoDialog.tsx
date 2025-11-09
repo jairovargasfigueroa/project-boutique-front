@@ -9,18 +9,20 @@ import {
   TextField,
   Box,
   MenuItem,
-  InputAdornment,
   CircularProgress,
+  Typography,
+  Avatar,
 } from "@mui/material";
-import { Producto } from "@/types/productos";
+import { ProductoCreate, ProductoUpdate } from "@/types/productos";
 import { useCategorias } from "@/hooks/useCategorias";
+import ImageIcon from "@mui/icons-material/Image";
 
 interface Props {
   open: boolean;
   mode: "create" | "edit";
-  initialData: Partial<Producto>;
+  initialData?: ProductoCreate | ProductoUpdate;
   onClose: () => void;
-  onSubmit: (data: Partial<Producto>) => Promise<void>;
+  onSubmit: (data: ProductoCreate | ProductoUpdate) => Promise<void>;
 }
 
 const GENEROS = [
@@ -36,15 +38,53 @@ const ProductoDialog: React.FC<Props> = ({
   onClose,
   onSubmit,
 }) => {
-  const [form, setForm] = useState<Partial<Producto>>(initialData);
+  const [form, setForm] = useState<ProductoCreate | ProductoUpdate>({
+    nombre: "",
+    descripcion: "",
+    genero: "",
+    marca: "",
+    categoria: 0,
+    image: undefined,
+  });
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { categorias, loading: loadingCategorias } = useCategorias();
 
   useEffect(() => {
-    setForm(initialData);
-  }, [initialData]);
+    if (initialData) {
+      setForm({
+        ...initialData,
+        image: undefined, // No enviar imagen si no se selecciona nueva
+      });
+      setImagePreview(null);
+    } else {
+      setForm({
+        nombre: "",
+        descripcion: "",
+        genero: "",
+        marca: "",
+        categoria: 0,
+        image: undefined,
+      });
+      setImagePreview(null);
+    }
+  }, [initialData, open]);
 
-  const handleChange = (field: keyof Producto, value: any) => {
+  const handleChange = (field: string, value: any) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setForm((prev) => ({ ...prev, image: file }));
+
+      // Crear preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSave = async () => {
@@ -75,13 +115,23 @@ const ProductoDialog: React.FC<Props> = ({
             onChange={(e) => handleChange("descripcion", e.target.value)}
           />
 
+          <TextField
+            label="Marca"
+            fullWidth
+            value={form.marca || ""}
+            onChange={(e) => handleChange("marca", e.target.value)}
+            required
+          />
+
           <Box display="flex" gap={2}>
             <TextField
               select
               label="Categoría"
               fullWidth
               value={form.categoria || ""}
-              onChange={(e) => handleChange("categoria", parseInt(e.target.value))}
+              onChange={(e) =>
+                handleChange("categoria", parseInt(e.target.value))
+              }
               disabled={loadingCategorias}
               required
             >
@@ -114,40 +164,39 @@ const ProductoDialog: React.FC<Props> = ({
             </TextField>
           </Box>
 
-          <Box display="flex" gap={2}>
-            <TextField
-              label="Precio Base"
+          {/* Upload de imagen */}
+          <Box>
+            <Button
+              variant="outlined"
+              component="label"
               fullWidth
-              type="number"
-              value={form.precio_base || ""}
-              onChange={(e) =>
-                handleChange("precio_base", parseFloat(e.target.value))
-              }
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">$</InputAdornment>
-                ),
-              }}
-              required
-            />
+              startIcon={<ImageIcon />}
+            >
+              {form.image ? "Cambiar imagen" : "Seleccionar imagen"}
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={handleImageChange}
+              />
+            </Button>
 
-            <TextField
-              label="Stock"
-              fullWidth
-              type="number"
-              value={form.stock || 0}
-              onChange={(e) => handleChange("stock", parseInt(e.target.value))}
-              required
-            />
+            {imagePreview && (
+              <Box mt={2} display="flex" justifyContent="center">
+                <Avatar
+                  src={imagePreview}
+                  variant="rounded"
+                  sx={{ width: 120, height: 120 }}
+                />
+              </Box>
+            )}
+
+            {form.image && (
+              <Typography variant="caption" display="block" mt={1}>
+                Archivo seleccionado: {form.image.name}
+              </Typography>
+            )}
           </Box>
-
-          <TextField
-            label="URL de Imagen"
-            fullWidth
-            value={form.imagen_url || ""}
-            onChange={(e) => handleChange("imagen_url", e.target.value)}
-            placeholder="https://ejemplo.com/imagen.jpg"
-          />
         </Box>
       </DialogContent>
       <DialogActions>

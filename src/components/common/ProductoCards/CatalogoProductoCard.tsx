@@ -20,7 +20,7 @@ export default function ProductCard({
   linkUrl = "/",
 }: ProductCardProps) {
   const imageSrc =
-    producto.imagen_url ||
+    producto.image ||
     "https://placehold.co/300x250/e3e3e3/999999?text=Producto";
 
   return (
@@ -49,7 +49,7 @@ export default function ProductCard({
           }}
         >
           <Stack direction="row" sx={{ alignItems: "center" }}>
-            <Typography variant="h6">${producto.precio_base}</Typography>
+            <Typography variant="h6">${producto.stock}</Typography>
           </Stack>
         </Stack>
       </CardContent>
