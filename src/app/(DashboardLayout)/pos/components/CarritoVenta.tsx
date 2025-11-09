@@ -46,7 +46,7 @@ const CarritoVenta = ({ onCobrar }: Props) => {
             {row.producto_nombre}
           </Typography>
           <Typography variant="caption" color="textSecondary">
-            {row.talla} - {row.color}
+            Talla: {row.talla || "Única"}
           </Typography>
         </Box>
       ),

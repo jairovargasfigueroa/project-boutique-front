@@ -28,6 +28,7 @@ export interface Venta {
   monto_total_pagar?: string;
   // Detalles
   detalles?: DetalleVenta[];
+  pagos?: Pago[]; // ✅ Incluir historial de pagos
 }
 
 export interface DetalleVenta {

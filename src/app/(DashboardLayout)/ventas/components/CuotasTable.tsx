@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import { IconEdit, IconCurrencyDollar } from "@tabler/icons-react";
 import GenericTable from "@/components/common/GenericTable";
-import type { Cuota } from "@/types/cuota.types";
+import type { CuotaCreditoConInfo as Cuota } from "@/types/ventas";
 import type { TableColumn } from "@/components/common/GenericTable/types";
 import { usePagarCuota } from "@/hooks/usePagos";
 
@@ -31,15 +31,18 @@ const METODOS_PAGO = [
   { value: "efectivo", label: "💵 Efectivo" },
   { value: "tarjeta", label: "💳 Tarjeta" },
   { value: "qr", label: "📱 Código QR" },
-  { value: "transferencia", label: "🏦 Transferencia" },
 ] as const;
 
 const CuotasTable = ({ cuotas, loading, onRefresh }: Props) => {
   const { pagarCuota, procesando } = usePagarCuota();
-  const [cuotaSeleccionada, setCuotaSeleccionada] = useState<Cuota | null>(null);
+  const [cuotaSeleccionada, setCuotaSeleccionada] = useState<Cuota | null>(
+    null
+  );
   const [dialogPagoOpen, setDialogPagoOpen] = useState(false);
   const [dialogEditOpen, setDialogEditOpen] = useState(false);
-  const [metodoPago, setMetodoPago] = useState<"efectivo" | "tarjeta" | "qr" | "transferencia">("efectivo");
+  const [metodoPago, setMetodoPago] = useState<"efectivo" | "tarjeta" | "qr">(
+    "efectivo"
+  );
   const [referenciaPago, setReferenciaPago] = useState("");
 
   const getEstadoColor = (estado: string) => {

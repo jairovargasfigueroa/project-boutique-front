@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import type { Pago, PagarCuotaRequest } from "@/types/pago.types";
+import type {
+  Pago,
+  PagarCuotaRequest,
+  RegistrarPagoRequest,
+  PagarAlContadoRequest,
+} from "@/types/ventas";
 import { pagoService } from "@/services/pagoService";
 
 export const usePagos = (ventaId?: number) => {
@@ -23,6 +28,23 @@ export const usePagos = (ventaId?: number) => {
     }
   };
 
+  const registrarPago = async (request: RegistrarPagoRequest) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const result = await pagoService.registrarPago(request);
+      await cargarPagos(); // Recargar pagos después de registrar
+      return result;
+    } catch (err: any) {
+      const errorMsg =
+        err.response?.data?.error || "Error al registrar el pago";
+      setError(errorMsg);
+      throw new Error(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (ventaId) {
       cargarPagos();
@@ -34,6 +56,7 @@ export const usePagos = (ventaId?: number) => {
     loading,
     error,
     refetch: cargarPagos,
+    registrarPago,
   };
 };
 
@@ -58,6 +81,35 @@ export const usePagarCuota = () => {
 
   return {
     pagarCuota,
+    procesando,
+    error,
+  };
+};
+
+export const usePagarAlContado = () => {
+  const [procesando, setProcesando] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const pagarAlContado = async (
+    ventaId: number,
+    request: PagarAlContadoRequest
+  ) => {
+    try {
+      setProcesando(true);
+      setError(null);
+      const result = await pagoService.pagarAlContado(ventaId, request);
+      return result;
+    } catch (err: any) {
+      const errorMsg = err.response?.data?.error || "Error al procesar el pago";
+      setError(errorMsg);
+      throw new Error(errorMsg);
+    } finally {
+      setProcesando(false);
+    }
+  };
+
+  return {
+    pagarAlContado,
     procesando,
     error,
   };

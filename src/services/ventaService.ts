@@ -1,10 +1,10 @@
-import type { 
-  Venta, 
-  DetalleVenta, 
+import type {
+  Venta,
+  DetalleVenta,
   CrearVentaRequest,
   AgregarDetalleRequest,
-  ActualizarDetalleRequest
-} from "@/types/venta.types";
+  ActualizarDetalleRequest,
+} from "@/types/ventas";
 import { apiClient } from "./apiBase";
 
 const ENDPOINT = "/ventas/";

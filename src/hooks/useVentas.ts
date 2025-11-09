@@ -1,5 +1,6 @@
+"use client";
 import { useState, useEffect } from "react";
-import type { Venta } from "@/types/venta.types";
+import type { Venta, CrearVentaRequest } from "@/types/ventas";
 import { ventaService } from "@/services/ventaService";
 
 export const useVentas = () => {
@@ -16,28 +17,6 @@ export const useVentas = () => {
     } catch (err: any) {
       console.error("Error al cargar ventas:", err);
       setError(err.response?.data?.error || "Error al cargar ventas");
-'use client';
-import { useState } from 'react';
-import { ventaService } from '@/services/ventaService';
-import { CrearVentaData, Venta } from '@/types/ventas';
-
-export const useVentas = () => {
-  const [venta, setVenta] = useState<Venta | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const crearVenta = async (data: CrearVentaData) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const nuevaVenta = await ventaService.crear(data);
-      console.log('Venta creada:', nuevaVenta);
-      setVenta(nuevaVenta);
-      return nuevaVenta;
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Error al crear venta';
-      setError(errorMsg);
-      throw err;
     } finally {
       setLoading(false);
     }
@@ -71,6 +50,11 @@ export const useVentaDetalle = (ventaId?: number) => {
     } catch (err: any) {
       console.error("Error al cargar venta:", err);
       setError(err.response?.data?.error || "Error al cargar venta");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const obtenerVenta = async (id: number) => {
     try {
       setLoading(true);
@@ -78,8 +62,27 @@ export const useVentaDetalle = (ventaId?: number) => {
       const data = await ventaService.getById(id);
       setVenta(data);
       return data;
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Error al obtener venta';
+    } catch (err: any) {
+      console.error("Error al obtener venta:", err);
+      const errorMsg = err.response?.data?.error || "Error al obtener venta";
+      setError(errorMsg);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const crearVenta = async (data: CrearVentaRequest) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const nuevaVenta = await ventaService.crear(data);
+      console.log("Venta creada:", nuevaVenta);
+      setVenta(nuevaVenta);
+      return nuevaVenta;
+    } catch (err: any) {
+      console.error("Error al crear venta:", err);
+      const errorMsg = err.response?.data?.error || "Error al crear venta";
       setError(errorMsg);
       throw err;
     } finally {
@@ -98,7 +101,7 @@ export const useVentaDetalle = (ventaId?: number) => {
     loading,
     error,
     refetch: cargarVenta,
+    obtenerVenta,
     crearVenta,
-    obtenerVenta
   };
 };

@@ -1,11 +1,5 @@
-// Ventas
-export * from "./venta.types";
-
-// Cuotas
-export * from "./cuota.types";
-
-// Pagos
-export * from "./pago.types";
+// Ventas (incluye pagos y cuotas)
+export * from "./ventas";
 
 // Productos
 export * from "./productos";

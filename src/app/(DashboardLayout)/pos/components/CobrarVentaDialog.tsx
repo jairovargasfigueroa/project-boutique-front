@@ -16,11 +16,13 @@ import {
   FormControlLabel,
   Radio,
   FormLabel,
+  Autocomplete,
 } from "@mui/material";
 import { useCarritoVentaStore } from "@/store/carritoVentaStore";
 import { ventaService } from "@/services/ventaService";
 import { pagoService } from "@/services/pagoService";
-import type { CrearVentaRequest } from "@/types/venta.types";
+import { useClientes } from "@/hooks/useUsuarios";
+import type { CrearVentaRequest } from "@/types/ventas";
 
 interface Props {
   open: boolean;
@@ -37,18 +39,20 @@ const METODOS_PAGO = [
   { value: "efectivo", label: "💵 Efectivo" },
   { value: "tarjeta", label: "💳 Tarjeta" },
   { value: "qr", label: "📱 Código QR" },
-  { value: "transferencia", label: "🏦 Transferencia" },
 ];
 
 const CobrarVentaDialog = ({ open, onClose, onSuccess }: Props) => {
   const { items, getTotal, clearCarrito } = useCarritoVentaStore();
+  const { clientes, loading: loadingClientes } = useClientes();
+
   const [tipoPago, setTipoPago] = useState<"contado" | "credito">("contado");
-  const [metodoPago, setMetodoPago] = useState<
-    "efectivo" | "tarjeta" | "qr" | "transferencia"
-  >("efectivo");
+  const [metodoPago, setMetodoPago] = useState<"efectivo" | "tarjeta" | "qr">(
+    "efectivo"
+  );
   const [referenciaPago, setReferenciaPago] = useState("");
   const [plazoMeses, setPlazoMeses] = useState(1);
   const [interes, setInteres] = useState(0);
+  const [clienteId, setClienteId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -74,14 +78,20 @@ const CobrarVentaDialog = ({ open, onClose, onSuccess }: Props) => {
 
       // Preparar datos según el nuevo formato del backend
       const ventaData: CrearVentaRequest = {
-        tipo_pago: tipoPago,
+        tipo_venta: tipoPago,
+        origen: "tienda", // Origen desde POS
         items: items.map((item) => ({
           variante_id: item.variante_id,
           cantidad: item.cantidad,
         })),
       };
 
-      // Si es crédito, agregar campos adicionales
+      // Agregar cliente solo si está seleccionado (no enviar null)
+      if (clienteId) {
+        ventaData.cliente = clienteId;
+      }
+
+      // Si es crédito, agregar campos adicionales y validar cliente
       if (tipoPago === "credito") {
         if (interes <= 0 || plazoMeses <= 0) {
           setError(
@@ -89,12 +99,15 @@ const CobrarVentaDialog = ({ open, onClose, onSuccess }: Props) => {
           );
           return;
         }
+
+        if (!clienteId) {
+          setError("Las ventas a crédito requieren seleccionar un cliente");
+          return;
+        }
+
         ventaData.interes = interes;
         ventaData.plazo_meses = plazoMeses;
       }
-
-      // Cliente null para venta anónima
-      ventaData.cliente = null;
 
       // Paso 1: Crear venta
       const venta = await ventaService.crear(ventaData);
@@ -139,6 +152,7 @@ const CobrarVentaDialog = ({ open, onClose, onSuccess }: Props) => {
       setReferenciaPago("");
       setInteres(0);
       setPlazoMeses(1);
+      setClienteId(null);
     } catch (err: any) {
       console.error("Error al procesar venta:", err);
 
@@ -183,9 +197,14 @@ const CobrarVentaDialog = ({ open, onClose, onSuccess }: Props) => {
             label="Tipo de Pago"
             fullWidth
             value={tipoPago}
-            onChange={(e) =>
-              setTipoPago(e.target.value as "contado" | "credito")
-            }
+            onChange={(e) => {
+              const nuevoTipo = e.target.value as "contado" | "credito";
+              setTipoPago(nuevoTipo);
+              // Si cambia a contado, limpiar cliente
+              if (nuevoTipo === "contado") {
+                setClienteId(null);
+              }
+            }}
           >
             {TIPOS_PAGO.map((tipo) => (
               <MenuItem key={tipo.value} value={tipo.value}>
@@ -193,6 +212,29 @@ const CobrarVentaDialog = ({ open, onClose, onSuccess }: Props) => {
               </MenuItem>
             ))}
           </TextField>
+
+          {/* Selector de Cliente (obligatorio para crédito, opcional para contado) */}
+          {tipoPago === "credito" && (
+            <Autocomplete
+              options={clientes}
+              getOptionLabel={(option) =>
+                `${option.first_name} ${option.last_name} (${option.email})`.trim()
+              }
+              loading={loadingClientes}
+              value={clientes.find((c) => c.id === clienteId) || null}
+              onChange={(_, newValue) => {
+                setClienteId(newValue?.id || null);
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Cliente *"
+                  required
+                  helperText="Requerido para ventas a crédito"
+                />
+              )}
+            />
+          )}
 
           {/* Método de Pago (solo para contado) */}
           {tipoPago === "contado" && (

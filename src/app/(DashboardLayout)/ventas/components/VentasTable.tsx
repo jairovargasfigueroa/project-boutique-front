@@ -2,7 +2,7 @@
 import { Box, Chip, IconButton, Tooltip } from "@mui/material";
 import { IconEye } from "@tabler/icons-react";
 import GenericTable from "@/components/common/GenericTable";
-import type { Venta } from "@/types/venta.types";
+import type { Venta } from "@/types/ventas";
 import type { TableColumn } from "@/components/common/GenericTable/types";
 import { useVentas } from "@/hooks/useVentas";
 
@@ -52,13 +52,13 @@ const VentasTable = ({ onVerDetalle }: Props) => {
         venta.cliente_nombre || "Cliente Anónimo",
     },
     {
-      key: "tipo_pago",
+      key: "tipo_venta",
       label: "Tipo",
       width: "120px",
       render: (_value: any, venta: Venta) => (
         <Chip
-          label={venta.tipo_pago === "contado" ? "Contado" : "Crédito"}
-          color={getTipoPagoColor(venta.tipo_pago) as any}
+          label={venta.tipo_venta === "contado" ? "Contado" : "Crédito"}
+          color={getTipoPagoColor(venta.tipo_venta) as any}
           size="small"
         />
       ),
@@ -68,26 +68,21 @@ const VentasTable = ({ onVerDetalle }: Props) => {
       label: "Total",
       width: "120px",
       render: (_value: any, venta: Venta) => {
-        const total = venta.tipo_pago === "credito" && venta.total_con_interes 
-          ? parseFloat(venta.total_con_interes)
-          : parseFloat(venta.total);
+        const total =
+          venta.tipo_venta === "credito" && venta.total_con_interes
+            ? parseFloat(venta.total_con_interes)
+            : parseFloat(venta.total);
         return `Bs ${total.toFixed(2)}`;
       },
     },
     {
-      key: "estado_pago",
+      key: "estado",
       label: "Estado",
       width: "120px",
       render: (_value: any, venta: Venta) => (
         <Chip
-          label={
-            venta.estado_pago === "pagado"
-              ? "Pagado"
-              : venta.estado_pago === "parcial"
-              ? "Parcial"
-              : "Pendiente"
-          }
-          color={getEstadoPagoColor(venta.estado_pago) as any}
+          label={venta.estado.charAt(0).toUpperCase() + venta.estado.slice(1)}
+          color={getEstadoPagoColor(venta.estado) as any}
           size="small"
         />
       ),
@@ -97,7 +92,7 @@ const VentasTable = ({ onVerDetalle }: Props) => {
       label: "Info Crédito",
       width: "180px",
       render: (_value: any, venta: Venta) =>
-        venta.tipo_pago === "credito" ? (
+        venta.tipo_venta === "credito" ? (
           <Box>
             <Box fontSize="0.875rem">
               {venta.plazo_meses} cuotas × Bs{" "}

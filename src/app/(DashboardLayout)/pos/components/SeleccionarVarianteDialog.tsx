@@ -46,43 +46,36 @@ const SeleccionarVarianteDialog = ({ open, onClose, producto }: Props) => {
       variante_id: variante.id,
       producto_nombre: producto.nombre,
       talla: variante.talla,
-      precio_unitario: typeof variante.precio === 'string' ? parseFloat(variante.precio) : variante.precio,
+      precio_unitario:
+        typeof variante.precio === "string"
+          ? parseFloat(variante.precio)
+          : variante.precio,
       cantidad: 1,
       image: producto.image,
       stock_disponible: variante.stock,
     });
 
     alert(
-      `${producto.nombre} ${variante.talla || 'Sin talla'} agregado al carrito`
+      `${producto.nombre} ${variante.talla || "Sin talla"} agregado al carrito`
     );
   };
 
   const variantesColumns = [
     {
-      key: "color",
-      label: "Color",
-      render: (value: string) => (
-        <Chip
-          label={value}
-          size="small"
-          sx={{
-            backgroundColor: value.toLowerCase(),
-            color: "#fff",
-          }}
-        />
+      key: "talla",
+      label: "Talla",
+      render: (value: string | null) => (
+        <Chip label={value || "Única"} size="small" color="primary" />
       ),
     },
     {
-      key: "talla",
-      label: "Talla",
-      render: (value: string) => <Chip label={value} size="small" />,
-    },
-    {
-      key: "precio_venta",
+      key: "precio",
       label: "Precio",
       align: "right" as const,
-      render: (value: number, row: ProductoVariante) =>
-        `Bs ${value.toFixed(2)}`,
+      render: (value: string | number, row: ProductoVariante) => {
+        const precio = typeof value === "string" ? parseFloat(value) : value;
+        return `Bs ${precio.toFixed(2)}`;
+      },
     },
     {
       key: "stock",

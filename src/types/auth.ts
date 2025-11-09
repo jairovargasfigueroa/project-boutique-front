@@ -6,8 +6,9 @@ export interface User {
   email: string;
   first_name: string;
   last_name: string;
-  rol: 'ADMIN' | 'VENDEDOR' | 'CLIENTE';
+  rol: 'admin' | 'vendedor' | 'cliente';
   telefono?: string;
+  activo?: boolean;
 }
 
 export interface LoginRequest {
