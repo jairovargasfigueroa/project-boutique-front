@@ -36,8 +36,28 @@ export const usePagos = (ventaId?: number) => {
       await cargarPagos(); // Recargar pagos después de registrar
       return result;
     } catch (err: any) {
-      const errorMsg =
-        err.response?.data?.error || "Error al registrar el pago";
+      console.error("Error al registrar pago:", err);
+      console.error("Respuesta del servidor:", err.response?.data);
+
+      // Obtener mensaje de error detallado
+      let errorMsg = "Error al registrar el pago";
+      if (err.response?.data) {
+        const data = err.response.data;
+        if (typeof data === "string") {
+          errorMsg = data;
+        } else if (data.error) {
+          errorMsg = data.error;
+        } else if (data.detail) {
+          errorMsg = data.detail;
+        } else {
+          // Mostrar todos los errores
+          const errors = Object.entries(data)
+            .map(([key, value]) => `${key}: ${value}`)
+            .join(", ");
+          errorMsg = errors || errorMsg;
+        }
+      }
+
       setError(errorMsg);
       throw new Error(errorMsg);
     } finally {

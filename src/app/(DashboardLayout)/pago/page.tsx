@@ -52,16 +52,19 @@ export default function PagoPage() {
 
       console.log("Registrando pago:", pagoData);
 
-      await registrarPago(pagoData);
+      const resultado = await registrarPago(pagoData);
 
-      console.log("Pago registrado exitosamente");
+      console.log("Pago registrado exitosamente:", resultado);
+
+      alert("¡Pago registrado exitosamente!");
 
       // Redirigir a confirmación
-      // router.push(`/pedido/${ventaId}/confirmacion`);
       router.push(`/catalogo`);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error:", err);
-      alert("Error al procesar el pago. Por favor intenta nuevamente.");
+      const mensajeError =
+        error || "Error al procesar el pago. Por favor intenta nuevamente.";
+      alert(mensajeError);
     }
   };
 
@@ -128,7 +131,11 @@ export default function PagoPage() {
         >
           {/* Columna izquierda: Formulario de pago */}
           <FormularioPago
-            totalVenta={parseFloat(venta.total)}
+            totalVenta={parseFloat(
+              venta.tipo_venta === "credito" && venta.total_con_interes
+                ? venta.total_con_interes
+                : venta.total
+            )}
             onDatosChange={setDatosPago}
           />
 

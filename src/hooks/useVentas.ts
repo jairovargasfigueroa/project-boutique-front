@@ -82,7 +82,27 @@ export const useVentaDetalle = (ventaId?: number) => {
       return nuevaVenta;
     } catch (err: any) {
       console.error("Error al crear venta:", err);
-      const errorMsg = err.response?.data?.error || "Error al crear venta";
+      console.error("Respuesta del servidor:", err.response?.data);
+
+      // Obtener mensaje de error detallado
+      let errorMsg = "Error al crear venta";
+      if (err.response?.data) {
+        const data = err.response.data;
+        if (typeof data === "string") {
+          errorMsg = data;
+        } else if (data.error) {
+          errorMsg = data.error;
+        } else if (data.detail) {
+          errorMsg = data.detail;
+        } else {
+          // Mostrar todos los errores de validación
+          const errors = Object.entries(data)
+            .map(([key, value]) => `${key}: ${value}`)
+            .join(", ");
+          errorMsg = errors || errorMsg;
+        }
+      }
+
       setError(errorMsg);
       throw err;
     } finally {

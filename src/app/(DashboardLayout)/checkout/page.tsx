@@ -56,9 +56,11 @@ export default function CheckoutPage() {
       vaciarCarrito();
 
       router.push(`/pago?venta=${venta.id}`);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error:", err);
-      alert("Error al procesar el pedido. Por favor intenta nuevamente.");
+      const mensajeError =
+        error || "Error al procesar el pedido. Por favor intenta nuevamente.";
+      alert(mensajeError);
     }
   };
 

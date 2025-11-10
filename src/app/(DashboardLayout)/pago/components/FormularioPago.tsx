@@ -108,7 +108,9 @@ export default function FormularioPago({
             helperText={`Total a pagar: Bs ${totalVenta.toFixed(2)}`}
             InputProps={{
               startAdornment: <Typography sx={{ mr: 1 }}>Bs</Typography>,
+              readOnly: true,
             }}
+            disabled
           />
 
           {/* Referencia */}
