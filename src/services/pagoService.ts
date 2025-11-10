@@ -1,5 +1,4 @@
 import { apiClient } from "./apiBase";
-import { CrearPagoData, Pago } from '@/types/pagos';
 import type {
   Pago,
   PagarAlContadoRequest,
@@ -8,8 +7,9 @@ import type {
   PagarCuotaResponse,
   RegistrarPagoRequest,
   RegistrarPagoResponse,
-} from "@/types/pago.types";
-const ENDPOINT = '/pagos/';
+} from "@/types/ventas";
+
+const ENDPOINT = "/pagos/";
 
 export const pagoService = {
   pagarAlContado: async (
@@ -40,10 +40,13 @@ export const pagoService = {
     return response.data;
   },
   getPagosByVenta: async (ventaId: number): Promise<Pago[]> => {
-    const response = await apiClient.get<Pago[]>(
-      `/pagos/por_venta/${ventaId}/`
-    );
-    return response.data;
+    const response = await apiClient.get<{
+      venta_id: number;
+      total_pagado: string;
+      cantidad_pagos: number;
+      pagos: Pago[];
+    }>(`/pagos/por_venta/${ventaId}/`);
+    return response.data.pagos; // Retornar solo el array de pagos
   },
   getAll: async (): Promise<Pago[]> => {
     const response = await apiClient.get<Pago[]>("/pagos/");
@@ -54,15 +57,22 @@ export const pagoService = {
     const response = await apiClient.get<Pago>(`/pagos/${id}/`);
     return response.data;
   },
-  crear: async (data: CrearPagoData) => {
-    const response = await apiClient.post<Pago>(ENDPOINT, data);
+
+  crear: async (data: RegistrarPagoRequest): Promise<RegistrarPagoResponse> => {
+    const response = await apiClient.post<RegistrarPagoResponse>(
+      ENDPOINT,
+      data
+    );
     return response.data;
   },
 
-  getByVenta: async (ventaId: number) => {
-    const response = await apiClient.get<Pago[]>(`${ENDPOINT}?venta=${ventaId}`);
+  getByVenta: async (ventaId: number): Promise<Pago[]> => {
+    const response = await apiClient.get<Pago[]>(
+      `${ENDPOINT}?venta=${ventaId}`
+    );
     return response.data;
-  }
+  },
+
   calcularTotalPagado: (pagos: Pago[]): number => {
     return pagos.reduce((sum, pago) => sum + parseFloat(pago.monto_pagado), 0);
   },

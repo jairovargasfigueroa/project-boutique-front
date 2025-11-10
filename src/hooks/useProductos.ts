@@ -1,10 +1,13 @@
 // src/hooks/useProductos.ts
-'use client';
-import { productoService } from '@/services/productoService';
-import { Producto, ProductoVariante } from '@/types/productos';
-import { useState, useEffect } from 'react';
-
-
+"use client";
+import { productoService } from "@/services/productoService";
+import {
+  Producto,
+  ProductoVariante,
+  ProductoCreate,
+  ProductoUpdate,
+} from "@/types/productos";
+import { useState, useEffect } from "react";
 
 export const useProductos = () => {
   const [productos, setProductos] = useState<Producto[]>([]);
@@ -19,45 +22,49 @@ export const useProductos = () => {
       setLoading(true);
       setError(null);
       const data = await productoService.getAll();
-      console.log('Productos',data)
+      console.log("Productos cargados:", data);
       setProductos(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al cargar productos');
+      setError(
+        err instanceof Error ? err.message : "Error al cargar productos"
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  // Crear producto
-  const createProducto = async (data: any) => {
+  const createProducto = async (data: ProductoCreate) => {
     try {
       setLoading(true);
       setError(null);
       const newProduct = await productoService.create(data);
       // Actualizar la lista local
-      setProductos(prev => [...prev, newProduct]);
+      setProductos((prev) => [...prev, newProduct]);
       return newProduct;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al crear producto');
-      throw err; // Re-lanzar para manejar en el componente si es necesario
+      setError(err instanceof Error ? err.message : "Error al crear producto");
+      throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  // Actualizar producto
-  const updateProducto = async (id: number, data: any) => {
+  /**
+   * Actualizar producto - El service maneja la transformación a FormData
+   */
+  const updateProducto = async (id: number, data: ProductoUpdate) => {
     try {
       setLoading(true);
       setError(null);
       const updatedProduct = await productoService.update(id, data);
-      // Actualizar la lista local
-      setProductos(prev => 
-        prev.map(prod => prod.id === id ? updatedProduct : prod)
+      setProductos((prev) =>
+        prev.map((prod) => (prod.id === id ? updatedProduct : prod))
       );
       return updatedProduct;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al actualizar producto');
+      setError(
+        err instanceof Error ? err.message : "Error al actualizar producto"
+      );
       throw err;
     } finally {
       setLoading(false);
@@ -70,10 +77,11 @@ export const useProductos = () => {
       setLoading(true);
       setError(null);
       await productoService.delete(id);
-      // Actualizar la lista local
-      setProductos(prev => prev.filter(prod => prod.id !== id));
+      setProductos((prev) => prev.filter((prod) => prod.id !== id));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al eliminar producto');
+      setError(
+        err instanceof Error ? err.message : "Error al eliminar producto"
+      );
       throw err;
     } finally {
       setLoading(false);
@@ -86,11 +94,13 @@ export const useProductos = () => {
       setLoadingVariantes(true);
       setError(null);
       const data = await productoService.getVariantesByProducto(productoId);
-      console.log('Variantes del producto', productoId, data);
+      console.log("Variantes del producto", productoId, data);
       setVariantes(data);
       return data;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al cargar variantes');
+      setError(
+        err instanceof Error ? err.message : "Error al cargar variantes"
+      );
       throw err;
     } finally {
       setLoadingVariantes(false);
@@ -109,12 +119,12 @@ export const useProductos = () => {
     error,
     variantes,
     loadingVariantes,
-    
+
     // Acciones
     createProducto,
     updateProducto,
     deleteProducto,
     refetch: fetchProductos,
-    fetchVariantes
+    fetchVariantes,
   };
 };

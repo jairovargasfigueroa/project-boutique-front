@@ -1,10 +1,10 @@
 import { apiClient } from "./apiBase";
 import type {
-  Cuota,
+  CuotaCreditoConInfo as Cuota,
   CuotasResponse,
   MarcarPagadaRequest,
   MarcarPagadaResponse,
-} from "@/types/cuota.types";
+} from "@/types/ventas";
 
 /**
  * Servicio para gestión de cuotas de ventas a crédito

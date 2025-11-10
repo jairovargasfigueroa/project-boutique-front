@@ -6,7 +6,7 @@ import DashboardCard from "@/app/(DashboardLayout)/components/shared/DashboardCa
 import VentasTable from "./components/VentasTable";
 import DetalleVentaDialog from "./components/DetalleVentaDialog";
 import CuotasSection from "./components/CuotasSection";
-import type { Venta } from "@/types/venta.types";
+import type { Venta } from "@/types/ventas";
 
 const VentasPage = () => {
   const [ventaSeleccionada, setVentaSeleccionada] = useState<Venta | null>(

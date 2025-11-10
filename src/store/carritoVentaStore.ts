@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { ItemCarritoVenta } from "@/types/venta.types";
+import type { ItemCarritoVenta } from "@/types/ventas";
 
 interface CarritoVentaState {
   items: ItemCarritoVenta[];
@@ -19,15 +19,24 @@ export const useCarritoVentaStore = create<CarritoVentaState>((set, get) => ({
   addItem: (item) => {
     const items = get().items;
     const existingItem = items.find((i) => i.variante_id === item.variante_id);
+    const precio =
+      typeof item.precio_unitario === "string"
+        ? parseFloat(item.precio_unitario)
+        : item.precio_unitario;
 
     if (existingItem) {
+      const precioExistente =
+        typeof existingItem.precio_unitario === "string"
+          ? parseFloat(existingItem.precio_unitario)
+          : existingItem.precio_unitario;
+
       set({
         items: items.map((i) =>
           i.variante_id === item.variante_id
             ? {
                 ...i,
                 cantidad: i.cantidad + item.cantidad,
-                subtotal: (i.cantidad + item.cantidad) * i.precio_unitario,
+                subtotal: (i.cantidad + item.cantidad) * precioExistente,
               }
             : i
         ),
@@ -38,7 +47,7 @@ export const useCarritoVentaStore = create<CarritoVentaState>((set, get) => ({
           ...items,
           {
             ...item,
-            subtotal: item.cantidad * item.precio_unitario,
+            subtotal: item.cantidad * precio,
           },
         ],
       });
@@ -58,17 +67,21 @@ export const useCarritoVentaStore = create<CarritoVentaState>((set, get) => ({
     }
 
     set({
-      items: get().items.map((item) =>
-        item.variante_id === varianteId
-          ? {
-              ...item,
-              cantidad: Math.min(cantidad, item.stock_disponible),
-              subtotal:
-                Math.min(cantidad, item.stock_disponible) *
-                item.precio_unitario,
-            }
-          : item
-      ),
+      items: get().items.map((item) => {
+        if (item.variante_id === varianteId) {
+          const precio =
+            typeof item.precio_unitario === "string"
+              ? parseFloat(item.precio_unitario)
+              : item.precio_unitario;
+
+          return {
+            ...item,
+            cantidad: Math.min(cantidad, item.stock_disponible),
+            subtotal: Math.min(cantidad, item.stock_disponible) * precio,
+          };
+        }
+        return item;
+      }),
     });
   },
 
@@ -91,7 +104,7 @@ export const useCarritoVentaStore = create<CarritoVentaState>((set, get) => ({
   },
 
   getTotal: () => {
-    return get().items.reduce((total, item) => total + item.subtotal, 0);
+    return get().items.reduce((total, item) => total + (item.subtotal || 0), 0);
   },
 
   getCantidadTotal: () => {

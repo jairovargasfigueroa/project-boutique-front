@@ -29,7 +29,7 @@ const CarritoVenta = ({ onCobrar }: Props) => {
   // Configuración de columnas
   const columns = [
     {
-      key: "imagen_url",
+      key: "image",
       label: "Imagen",
       align: "center" as const,
       width: "80px",
@@ -46,7 +46,7 @@ const CarritoVenta = ({ onCobrar }: Props) => {
             {row.producto_nombre}
           </Typography>
           <Typography variant="caption" color="textSecondary">
-            {row.talla} - {row.color}
+            Talla: {row.talla || "Única"}
           </Typography>
         </Box>
       ),

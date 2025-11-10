@@ -29,14 +29,6 @@ const Menuitems: MenuitemsType[] = [
   },
   {
     id: uniqueId(),
-    title: "Dashboard 2",
-    icon: "chart-line-duotone",
-    href: "https://spike-nextjs-pro-main.vercel.app/dashboards/dashboard2",
-
-    chip: "Pro",
-  },
-  {
-    id: uniqueId(),
     title: "Punto de Venta",
     icon: "shopping-cart-line-duotone",
     href: "/pos",
@@ -47,13 +39,6 @@ const Menuitems: MenuitemsType[] = [
     title: "Ventas",
     icon: "bill-list-line-duotone",
     href: "/ventas",
-  },
-
-  {
-    id: uniqueId(),
-    title: "Reportes",
-    icon: "chart-2-line-duotone",
-    href: "/reportes",
   },
 
   {

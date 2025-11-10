@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { Cuota } from "@/types/cuota.types";
+import type { CuotaCreditoConInfo as Cuota } from "@/types/ventas";
 import { cuotaService } from "@/services/cuotaService";
 
 export const useCuotas = (ventaId?: number) => {

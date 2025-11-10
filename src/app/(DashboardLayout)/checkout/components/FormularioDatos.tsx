@@ -1,6 +1,16 @@
-'use client';
-import { Box, Card, CardContent, Typography, TextField, Alert } from '@mui/material';
-import { useState } from 'react';
+"use client";
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  TextField,
+  Alert,
+  Autocomplete,
+  CircularProgress,
+} from "@mui/material";
+import { useState, useEffect } from "react";
+import { usuarioService, UsuarioListItem } from "@/services/usuarioService";
 
 interface DatosCliente {
   cliente: string;
@@ -17,26 +27,67 @@ interface FormularioDatosProps {
   initialValues?: Partial<DatosCliente>;
 }
 
-export default function FormularioDatos({ 
-  disabled = true,
+export default function FormularioDatos({
+  disabled = false,
   onDatosChange,
-  initialValues 
+  initialValues,
 }: FormularioDatosProps) {
   const [datos, setDatos] = useState<DatosCliente>({
-    cliente: initialValues?.cliente || '',
-    nombre: initialValues?.nombre || '',
-    telefono: initialValues?.telefono || '',
-    email: initialValues?.email || '',
-    direccion: initialValues?.direccion || '',
-    ciudad: initialValues?.ciudad || ''
+    cliente: initialValues?.cliente || "",
+    nombre: initialValues?.nombre || "",
+    telefono: initialValues?.telefono || "",
+    email: initialValues?.email || "",
+    direccion: initialValues?.direccion || "",
+    ciudad: initialValues?.ciudad || "",
   });
 
-  const handleChange = (field: keyof DatosCliente) => (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const nuevosDatos = { ...datos, [field]: event.target.value };
-    setDatos(nuevosDatos);
-    onDatosChange?.(nuevosDatos);
+  const [clientes, setClientes] = useState<UsuarioListItem[]>([]);
+  const [loadingClientes, setLoadingClientes] = useState(false);
+  const [selectedCliente, setSelectedCliente] =
+    useState<UsuarioListItem | null>(null);
+
+  // Cargar lista de clientes
+  useEffect(() => {
+    const cargarClientes = async () => {
+      try {
+        setLoadingClientes(true);
+        const data = await usuarioService.getClientes();
+        setClientes(data);
+      } catch (error) {
+        console.error("Error al cargar clientes:", error);
+      } finally {
+        setLoadingClientes(false);
+      }
+    };
+
+    if (!disabled) {
+      cargarClientes();
+    }
+  }, [disabled]);
+
+  const handleChange =
+    (field: keyof DatosCliente) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const nuevosDatos = { ...datos, [field]: event.target.value };
+      setDatos(nuevosDatos);
+      onDatosChange?.(nuevosDatos);
+    };
+
+  const handleClienteSelect = (cliente: UsuarioListItem | null) => {
+    setSelectedCliente(cliente);
+
+    if (cliente) {
+      const nuevosDatos = {
+        cliente: cliente.id.toString(),
+        nombre: usuarioService.formatearNombreCompleto(cliente),
+        telefono: cliente.telefono || "",
+        email: cliente.email,
+        direccion: "", // No tenemos dirección en el usuario
+        ciudad: "",
+      };
+      setDatos(nuevosDatos);
+      onDatosChange?.(nuevosDatos);
+    }
   };
 
   return (
@@ -45,71 +96,95 @@ export default function FormularioDatos({
         <Typography variant="h5" gutterBottom>
           Información de Entrega
         </Typography>
-        
-        {disabled && (
-          <Alert severity="info" sx={{ mb: 3 }}>
-            Próximamente podrás ingresar tus datos de envío aquí.
-          </Alert>
-        )}
-        
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: disabled ? 2 : 3 }}>
+
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 3 }}>
+          {/* Buscar cliente por username */}
+          <Autocomplete
+            options={clientes}
+            getOptionLabel={(option) =>
+              `${option.username} - ${usuarioService.formatearNombreCompleto(
+                option
+              )}`
+            }
+            loading={loadingClientes}
+            value={selectedCliente}
+            onChange={(_, newValue) => handleClienteSelect(newValue)}
+            disabled={disabled}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Buscar Cliente"
+                placeholder="Busca por username o nombre..."
+                helperText="Busca un cliente existente para autocompletar sus datos"
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <>
+                      {loadingClientes ? (
+                        <CircularProgress color="inherit" size={20} />
+                      ) : null}
+                      {params.InputProps.endAdornment}
+                    </>
+                  ),
+                }}
+              />
+            )}
+          />
+
           <TextField
             label="ID Cliente"
             fullWidth
-            disabled={disabled}
+            disabled
             value={datos.cliente}
-            onChange={handleChange('cliente')}
-            placeholder={disabled ? "Próximamente..." : "1"}
-            helperText={disabled ? "" : "ID del cliente (número)"}
+            placeholder="Se llenará automáticamente"
+            helperText="ID del cliente seleccionado"
             type="number"
           />
-          
+
           <TextField
             label="Nombre completo"
             fullWidth
-            disabled={disabled}
+            disabled
             value={datos.nombre}
-            onChange={handleChange('nombre')}
-            placeholder={disabled ? "Próximamente..." : "Juan Pérez"}
+            placeholder="Se llenará automáticamente"
           />
-          
+
           <TextField
             label="Teléfono"
             fullWidth
-            disabled={disabled}
             value={datos.telefono}
-            onChange={handleChange('telefono')}
-            placeholder={disabled ? "Próximamente..." : "300 123 4567"}
+            onChange={handleChange("telefono")}
+            placeholder="Ej: 70123456"
+            helperText="Editable: puedes modificar el teléfono"
           />
-          
+
           <TextField
             label="Email"
             type="email"
             fullWidth
-            disabled={disabled}
+            disabled
             value={datos.email}
-            onChange={handleChange('email')}
-            placeholder={disabled ? "Próximamente..." : "correo@ejemplo.com"}
+            placeholder="Se llenará automáticamente"
           />
-          
+
           <TextField
             label="Dirección"
             fullWidth
-            disabled={disabled}
             multiline
             rows={2}
             value={datos.direccion}
-            onChange={handleChange('direccion')}
-            placeholder={disabled ? "Próximamente..." : "Calle 123 #45-67"}
+            onChange={handleChange("direccion")}
+            placeholder="Ej: Zona Sur, Calle 21, Casa 456"
+            helperText="Ingresa la dirección de entrega"
           />
-          
+
           <TextField
             label="Ciudad"
             fullWidth
-            disabled={disabled}
             value={datos.ciudad}
-            onChange={handleChange('ciudad')}
-            placeholder={disabled ? "Próximamente..." : "Bogotá"}
+            onChange={handleChange("ciudad")}
+            placeholder="Ej: La Paz, Cochabamba, Santa Cruz"
+            helperText="Ciudad de entrega"
           />
         </Box>
       </CardContent>

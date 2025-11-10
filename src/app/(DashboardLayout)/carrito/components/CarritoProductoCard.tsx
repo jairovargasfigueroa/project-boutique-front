@@ -38,7 +38,7 @@ export default function CarritoProductoCard({ item, onUpdateQuantity, onRemove }
       {/* Imagen */}
       <Box
         component="img"
-        src={item.variante.imagen || item.producto.imagen || 'https://placehold.co/150x150'}
+        src={item.producto.image || 'https://placehold.co/150x150'}
         alt={item.producto.nombre}
         sx={{
           width: 120,
@@ -54,18 +54,11 @@ export default function CarritoProductoCard({ item, onUpdateQuantity, onRemove }
           {item.producto.nombre}
         </Typography>
         
-        <Box sx={{ display: 'flex', gap: 2, mb: 1 }}>
-          {item.variante.talla && (
-            <Typography variant="body2" color="text.secondary">
-              Talla: <strong>{item.variante.talla}</strong>
-            </Typography>
-          )}
-          {item.variante.color && (
-            <Typography variant="body2" color="text.secondary">
-              Color: <strong>{item.variante.color}</strong>
-            </Typography>
-          )}
-        </Box>
+        {item.variante.talla && (
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            Talla: <strong>{item.variante.talla}</strong>
+          </Typography>
+        )}
         
         <Typography variant="body2" color="text.secondary">
           Precio unitario: ${item.precioUnitario}

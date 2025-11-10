@@ -1,42 +1,58 @@
+// ============================================
+// TIPOS BASE (Match con backend)
+// ============================================
+
 export interface Venta {
   id: number;
   cliente: number | null;
   cliente_nombre?: string;
-  fecha: string;
-  total: string;
-  tipo_pago: "contado" | "credito";
-  estado_pago: "pendiente" | "parcial" | "pagado";
+  vendedor?: number | null;
+  vendedor_nombre?: string | null;
+  // Información del cliente (snapshot)
+  correo_cliente?: string | null;
+  direccion_cliente?: string | null;
+  nombre_cliente?: string | null;
+  telefono_cliente?: string | null;
+  numero_cliente?: string | null;
+  // Información de la venta
+  fecha: string; // DateField
+  total: string; // DecimalField
+  tipo_venta: "contado" | "credito"; // Renombrado de tipo_pago
+  origen?: "tienda" | "ecommerce";
+  estado: string; // estado general de la venta
+  // Crédito
   interes?: string | null;
-  total_con_interes?: string | null;
+  total_con_interes?: string;
   plazo_meses?: number | null;
-  cuota_mensual?: string | null;
+  cuota_mensual?: string;
+  monto_total_pagar?: string;
+  // Detalles
   detalles?: DetalleVenta[];
+  pagos?: Pago[]; // ✅ Incluir historial de pagos
 }
 
 export interface DetalleVenta {
   id: number;
-  variante: number;
+  variante_producto: number; // Renombrado de 'variante'
   cantidad: number;
-  precio_unitario: string;
-  subtotal: string;
-  producto_nombre: string;
-  talla: string;
-  color: string;
+  precio_unitario: string; // DecimalField
+  sub_total: string; // Renombrado de 'subtotal', DecimalField
+  nombre_producto: string; // Snapshot del nombre
+  talla: string | null; // Snapshot de la talla
 }
 
 export interface Pago {
   id: number;
   venta: number;
-  cuota?: number | null;
-  cuota_numero?: number | null;
-  fecha_pago: string;
-  monto_pagado: string;
-  metodo_pago: "efectivo" | "tarjeta" | "qr" | "transferencia";
+  cuota?: number | null; // FK opcional a CuotaCredito
+  fecha_pago: string; // DateTimeField
+  monto_pagado: string; // DecimalField
+  metodo_pago: "efectivo" | "tarjeta" | "qr";
   referencia_pago?: string | null;
 }
 
 export interface PagarAlContadoRequest {
-  metodo_pago: "efectivo" | "tarjeta" | "qr" | "transferencia";
+  metodo_pago: "efectivo" | "tarjeta" | "qr";
   referencia_pago?: string;
 }
 
@@ -48,7 +64,7 @@ export interface PagarAlContadoResponse {
 
 export interface PagarCuotaRequest {
   cuota: number;
-  metodo_pago: "efectivo" | "tarjeta" | "qr" | "transferencia";
+  metodo_pago: "efectivo" | "tarjeta" | "qr";
   referencia_pago?: string;
 }
 
@@ -60,7 +76,7 @@ export interface PagarCuotaResponse {
 export interface RegistrarPagoRequest {
   venta: number;
   monto_pagado: number;
-  metodo_pago: "efectivo" | "tarjeta" | "qr" | "transferencia";
+  metodo_pago: "efectivo" | "tarjeta" | "qr";
   cuota?: number;
   referencia_pago?: string;
 }
@@ -74,28 +90,34 @@ export interface RegistrarPagoResponse {
 export interface ItemCarritoVenta {
   variante_id: number;
   producto_nombre: string;
-  talla: string;
-  color: string;
-  precio_unitario: number;
+  talla: string | null;
+  precio_unitario: number | string; // DecimalField viene como string
   cantidad: number;
-  subtotal: number;
-  imagen_url?: string;
+  subtotal?: number;
+  image?: string | null;
   stock_disponible: number;
 }
 
 export interface CrearVentaRequest {
+  // Información del cliente
   cliente?: number | null;
-  tipo_pago: "contado" | "credito";
-  items: {
-    variante_id: number;
-    cantidad: number;
-  }[];
+  vendedor?: number | null;
+  correo_cliente?: string;
+  direccion_cliente?: string;
+  nombre_cliente?: string;
+  telefono_cliente?: string;
+  numero_cliente?: string;
+  // Información de la venta
+  tipo_venta: "contado" | "credito"; // Renombrado de tipo_pago
+  origen?: "tienda" | "ecommerce";
+  items: ItemVentaCreate[];
+  // Para crédito
   interes?: number;
   plazo_meses?: number;
 }
 
 export interface AgregarDetalleRequest {
-  variante: number;
+  variante_producto: number; // Renombrado de 'variante'
   cantidad: number;
   precio_unitario?: number;
 }
@@ -105,25 +127,31 @@ export interface ActualizarDetalleRequest {
   precio_unitario?: number;
 }
 
-// ============ CUOTAS ============
+// ============================================
+// CUOTAS DE CRÉDITO
+// ============================================
 
-export interface Cuota {
+export interface CuotaCredito {
   id: number;
   venta: number;
+  numero_cuota: number;
+  fecha_vencimiento: string; // DateField
+  monto_cuota: string; // DecimalField
+  estado: "pendiente" | "pagada" | "vencida";
+  fecha_pago: string | null; // DateField, nullable
+  esta_vencida?: boolean; // Property calculada desde el backend
+}
+
+// Para listados con información adicional
+export interface CuotaCreditoConInfo extends CuotaCredito {
   venta_id: number;
   cliente_nombre: string;
-  numero_cuota: number;
-  fecha_vencimiento: string;
-  monto_cuota: string;
-  estado: "pendiente" | "pagada" | "vencida";
   estado_display: string;
-  fecha_pago: string | null;
-  esta_vencida: boolean;
 }
 
 export interface CuotasResponse {
   count: number;
-  cuotas: Cuota[];
+  cuotas: CuotaCreditoConInfo[];
   dias?: number;
 }
 
@@ -133,23 +161,15 @@ export interface MarcarPagadaRequest {
 
 export interface MarcarPagadaResponse {
   message: string;
-  cuota: Cuota;
-export interface ItemVenta {
+  cuota: CuotaCredito;
+}
+
+// ============================================
+// TIPOS PARA CREAR VENTAS
+// ============================================
+
+export interface ItemVentaCreate {
   variante_id: number;
   cantidad: number;
-}
-
-export interface CrearVentaData {
-  cliente: number | null;
-  items: ItemVenta[];
-  tipo_pago: 'contado';
-}
-
-export interface Venta {
-  id: number;
-  numero_pedido: string;
-  total: number;
-  estado: 'pendiente' | 'pagado' | 'en_preparacion' | 'enviado' | 'entregado' | 'expirado';
-  fecha_creacion: string;
-  items: ItemVenta[];
+  precio_unitario?: number; // Opcional, usa el precio de la variante si no se envía
 }

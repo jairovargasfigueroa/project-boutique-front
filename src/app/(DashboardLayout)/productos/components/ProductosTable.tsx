@@ -41,11 +41,24 @@ const ProductosTable = ({
   // Configuración de columnas
   const productColumns = [
     {
-      key: "imagen_url",
+      key: "image",
       label: "Imagen",
       align: "center" as const,
-      render: (value: string) => (
-        <Avatar src={value} alt="Producto" sx={{ width: 40, height: 40 }} />
+      render: (value: string | null) => (
+        <Avatar 
+          src={value || undefined} 
+          alt="Producto" 
+          sx={{ width: 40, height: 40 }}
+          imgProps={{
+            onError: (e: any) => {
+              // Si falla la carga, mostrar inicial
+              e.target.style.display = 'none';
+            }
+          }}
+        >
+          {/* Mostrar inicial del producto si no hay imagen o falla */}
+          P
+        </Avatar>
       ),
     },
     {
@@ -53,10 +66,15 @@ const ProductosTable = ({
       label: "Nombre del Producto",
     },
     {
+      key: "marca",
+      label: "Marca",
+      render: (value: string) => value || "-",
+    },
+    {
       key: "categoria_nombre",
       label: "Categoría",
       render: (value: string) => (
-        <Chip label={value} size="small" color="primary" />
+        <Chip label={value || "Sin categoría"} size="small" color="primary" />
       ),
     },
     {
@@ -65,19 +83,13 @@ const ProductosTable = ({
       render: (value: string) => value || "-",
     },
     {
-      key: "precio_base",
-      label: "Precio",
-      align: "right" as const,
-      render: (value: number) => `$${value.toFixed(2)}`,
-    },
-    {
       key: "stock",
-      label: "Stock",
+      label: "Stock Total",
       align: "center" as const,
-      render: (value: number) => (
+      render: (value: number | undefined) => (
         <Chip
-          label={value}
-          color={value > 10 ? "success" : value > 0 ? "warning" : "error"}
+          label={value !== undefined ? value : 0}
+          color={value && value > 10 ? "success" : value && value > 0 ? "warning" : "error"}
           size="small"
         />
       ),

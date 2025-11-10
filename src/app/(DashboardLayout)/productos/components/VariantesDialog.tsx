@@ -7,12 +7,11 @@ import {
   IconButton,
   Box,
   Chip,
-  Avatar,
   Button,
 } from "@mui/material";
 import { Close, Edit, Delete, Add } from "@mui/icons-material";
 import GenericTable from "@/components/common/GenericTable";
-import { Producto, ProductoVariante } from "@/types/productos";
+import { Producto, ProductoVariante, VarianteProductoCreate, VarianteProductoUpdate } from "@/types/productos";
 import { useVariantes } from "@/hooks/useVariantes";
 import VarianteDialog from "./VarianteDialog";
 
@@ -37,8 +36,8 @@ const VariantesDialog = ({ open, onClose, producto }: Props) => {
     "create" | "edit"
   >("create");
   const [selectedVariante, setSelectedVariante] = useState<
-    Partial<ProductoVariante>
-  >({});
+    VarianteProductoCreate | VarianteProductoUpdate | undefined
+  >(undefined);
 
   useEffect(() => {
     if (open) {
@@ -47,23 +46,29 @@ const VariantesDialog = ({ open, onClose, producto }: Props) => {
   }, [open, producto.id]);
 
   const handleCreate = () => {
-    setSelectedVariante({});
+    setSelectedVariante(undefined);
     setVarianteDialogMode("create");
     setVarianteDialogOpen(true);
   };
 
+  const [editingVarianteId, setEditingVarianteId] = useState<number | null>(null);
+
   const handleEdit = (variante: ProductoVariante) => {
-    setSelectedVariante(variante);
+    // Convertir ProductoVariante a VarianteProductoUpdate
+    const varianteUpdate: VarianteProductoUpdate = {
+      talla: variante.talla,
+      precio: typeof variante.precio === 'string' ? parseFloat(variante.precio) : variante.precio,
+      stock: variante.stock,
+      stock_minimo: variante.stock_minimo,
+    };
+    setSelectedVariante(varianteUpdate);
+    setEditingVarianteId(variante.id);
     setVarianteDialogMode("edit");
     setVarianteDialogOpen(true);
   };
 
   const handleDelete = async (variante: ProductoVariante) => {
-    if (
-      window.confirm(
-        `¿Eliminar la variante ${variante.talla} - ${variante.color}?`
-      )
-    ) {
+    if (window.confirm(`¿Eliminar la variante ${variante.talla}?`)) {
       try {
         await deleteVariante(variante.id);
         refetch(producto.id);
@@ -73,14 +78,15 @@ const VariantesDialog = ({ open, onClose, producto }: Props) => {
     }
   };
 
-  const handleSubmit = async (data: Partial<ProductoVariante>) => {
+  const handleSubmit = async (data: VarianteProductoCreate | VarianteProductoUpdate) => {
     try {
       if (varianteDialogMode === "create") {
-        await createVariante(data as Omit<ProductoVariante, "id">);
-      } else if (selectedVariante.id) {
-        await updateVariante(selectedVariante.id, data);
+        await createVariante(data as VarianteProductoCreate);
+      } else if (editingVarianteId) {
+        await updateVariante(editingVarianteId, data as VarianteProductoUpdate);
       }
       setVarianteDialogOpen(false);
+      setEditingVarianteId(null);
       refetch(producto.id);
     } catch (error) {
       console.error("Error al guardar:", error);
@@ -91,33 +97,18 @@ const VariantesDialog = ({ open, onClose, producto }: Props) => {
     {
       key: "talla",
       label: "Talla",
-      render: (value: string) => <Chip label={value} size="small" />,
-    },
-    {
-      key: "color",
-      label: "Color",
-      render: (value: string) => (
-        <Chip
-          label={value}
-          size="small"
-          sx={{
-            backgroundColor: value.toLowerCase(),
-            color: "#fff",
-          }}
-        />
+      render: (value: string | null) => (
+        <Chip label={value || "Sin talla"} size="small" />
       ),
     },
     {
-      key: "precio_venta",
-      label: "Precio Venta",
+      key: "precio",
+      label: "Precio",
       align: "right" as const,
-      render: (value: number) => (value ? `$${value.toFixed(2)}` : "-"),
-    },
-    {
-      key: "precio_costo",
-      label: "Precio Costo",
-      align: "right" as const,
-      render: (value: number) => (value ? `$${value.toFixed(2)}` : "-"),
+      render: (value: string | number) => {
+        const precio = typeof value === 'string' ? parseFloat(value) : value;
+        return precio ? `Bs. ${precio.toFixed(2)}` : "-";
+      },
     },
     {
       key: "stock",
