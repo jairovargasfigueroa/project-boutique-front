@@ -14,8 +14,12 @@ export interface UsuarioListItem {
 }
 
 export const usuarioService = {
-  getAll: async (): Promise<UsuarioListItem[]> => {
-    const response = await apiClient.get<UsuarioListItem[]>(ENDPOINT);
+  getAll: async (rol?: string): Promise<UsuarioListItem[]> => {
+    const url = rol ? `${ENDPOINT}?rol=${rol}` : ENDPOINT;
+    console.log('🔵 [usuarioService.getAll] Parámetro rol recibido:', rol);
+    console.log('🔵 [usuarioService.getAll] URL enviada al backend:', url);
+    const response = await apiClient.get<UsuarioListItem[]>(url);
+    console.log('🟢 [usuarioService.getAll] Respuesta del backend:', response.data);
     return response.data;
   },
 
@@ -24,18 +28,8 @@ export const usuarioService = {
     return response.data;
   },
 
-  getClientes: async (): Promise<UsuarioListItem[]> => {
-    const usuarios = await usuarioService.getAll();
-    return usuarios.filter((u) => u.rol === "cliente");
-  },
-
-  getVendedores: async (): Promise<UsuarioListItem[]> => {
-    const usuarios = await usuarioService.getAll();
-    return usuarios.filter((u) => u.rol === "vendedor");
-  },
-
   crear: async (data: Partial<User>): Promise<User> => {
-    const response = await apiClient.post<User>(ENDPOINT, data);
+    const response = await apiClient.post<User>(`${ENDPOINT}registro/`, data);
     return response.data;
   },
 

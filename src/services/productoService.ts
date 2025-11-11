@@ -3,6 +3,7 @@ import {
   ProductoVariante,
   ProductoCreate,
   ProductoUpdate,
+  FiltrosProducto,
 } from "@/types/productos";
 import { apiClient } from "./apiBase";
 
@@ -49,8 +50,10 @@ const prepareProductoUpdateData = (
 };
 
 export const productoService = {
-  getAll: async () => {
-    const response = await apiClient.get<Producto[]>(ENDPOINT);
+  getAll: async (filtros?: FiltrosProducto) => {
+    const response = await apiClient.get<Producto[]>(ENDPOINT, {
+      params: filtros,
+    });
     return response.data;
   },
 

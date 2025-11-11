@@ -6,10 +6,11 @@ import {
   ProductoVariante,
   ProductoCreate,
   ProductoUpdate,
+  FiltrosProducto,
 } from "@/types/productos";
 import { useState, useEffect } from "react";
 
-export const useProductos = () => {
+export const useProductos = (filtros?: FiltrosProducto) => {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +22,7 @@ export const useProductos = () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await productoService.getAll();
+      const data = await productoService.getAll(filtros);
       console.log("Productos cargados:", data);
       setProductos(data);
     } catch (err) {
@@ -107,10 +108,10 @@ export const useProductos = () => {
     }
   };
 
-  // Cargar productos al montar el componente
+  // Cargar productos al montar el componente y cuando cambien los filtros
   useEffect(() => {
     fetchProductos();
-  }, []);
+  }, [JSON.stringify(filtros)]);
 
   return {
     // Estado

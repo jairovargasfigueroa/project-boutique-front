@@ -13,6 +13,7 @@ interface MenuitemsType {
   chipColor?: string;
   variant?: string;
   external?: boolean;
+  roles?: ('admin' | 'vendedor' | 'cliente')[];
 }
 
 const Menuitems: MenuitemsType[] = [
@@ -26,12 +27,14 @@ const Menuitems: MenuitemsType[] = [
     title: "Dashboard",
     icon: "screencast-2-line-duotone",
     href: "/",
+    roles: ['admin', 'vendedor', 'cliente'],
   },
   {
     id: uniqueId(),
     title: "Punto de Venta",
     icon: "shopping-cart-line-duotone",
     href: "/pos",
+    roles: ['admin', 'vendedor'],
   },
 
   {
@@ -39,6 +42,7 @@ const Menuitems: MenuitemsType[] = [
     title: "Ventas",
     icon: "bill-list-line-duotone",
     href: "/ventas",
+    roles: ['admin', 'vendedor'],
   },
 
   {
@@ -46,6 +50,7 @@ const Menuitems: MenuitemsType[] = [
     title: "Inventario",
     icon: "box-linear",
     href: "/productos",
+    roles: ['admin', 'vendedor'],
   },
 
   {
@@ -53,12 +58,22 @@ const Menuitems: MenuitemsType[] = [
     title: "Catalogo",
     icon: "box-linear",
     href: "/catalogo",
+    roles: ['admin', 'vendedor', 'cliente'],
   },
   {
     id: uniqueId(),
     title: "Categorías",
     icon: "category-2-line-duotone",
     href: "/categorias",
+    roles: ['admin', 'vendedor'],
+  },
+
+  {
+    id: uniqueId(),
+    title: "Usuarios",
+    icon: "users-group-rounded-line-duotone",
+    href: "/usuarios",
+    roles: ['admin'],
   },
 
   {
@@ -97,6 +112,7 @@ const Menuitems: MenuitemsType[] = [
     title: "Icons",
     icon: "smile-circle-linear",
     href: "/icons",
+    roles: ['admin'],
   },
 
   {
@@ -104,6 +120,7 @@ const Menuitems: MenuitemsType[] = [
     title: "Table",
     icon: "tablet-line-duotone",
     href: "/table",
+    roles: ['admin'],
   },
 
   {
@@ -111,24 +128,28 @@ const Menuitems: MenuitemsType[] = [
     title: "Form",
     icon: "window-frame-broken",
     href: "/sample-form",
+    roles: ['admin'],
   },
   {
     id: uniqueId(),
     title: "Sample Page",
     icon: "window-frame-broken",
     href: "/sample-page",
+    roles: ['admin'],
   },
   {
     id: uniqueId(),
     title: "Typography",
     icon: "text-bold-square-line-duotone",
     href: "/utilities/typography",
+    roles: ['admin'],
   },
   {
     id: uniqueId(),
     title: "Shadow",
     icon: "box-minimalistic-broken",
     href: "/utilities/shadow",
+    roles: ['admin'],
   },
 
   {
@@ -140,12 +161,14 @@ const Menuitems: MenuitemsType[] = [
     title: "Login",
     icon: "login-2-broken",
     href: "/authentication/login",
+    roles: ['admin', 'vendedor', 'cliente'],
   },
   {
     id: uniqueId(),
     title: "Register",
     icon: "shield-user-linear",
     href: "/authentication/register",
+    roles: ['admin', 'vendedor', 'cliente'],
   },
 
   {
@@ -154,6 +177,7 @@ const Menuitems: MenuitemsType[] = [
     icon: "forbidden-circle-line-duotone",
     href: "",
     disabled: true,
+    roles: ['admin'],
   },
 
   {
@@ -162,6 +186,7 @@ const Menuitems: MenuitemsType[] = [
     external: true,
     icon: "link-bold-duotone",
     href: "https://google.com",
+    roles: ['admin'],
   },
 ];
 

@@ -14,6 +14,7 @@ import { Icon } from "@iconify/react";
 import Link from "next/link";
 import { Upgrade } from "./Updrade";
 import theme from "@/utils/theme";
+import useAuthStore from "@/store/authStore";
 
 const renderMenuItems = (items: any[], pathDirect: string) => {
 
@@ -89,6 +90,20 @@ const renderMenuItems = (items: any[], pathDirect: string) => {
 const SidebarItems = () => {
     const pathname = usePathname();
     const pathDirect = pathname;
+    const { user } = useAuthStore();
+    const userRole = user?.rol;
+
+    // Filtrar items según el rol del usuario
+    const filteredMenuItems = Menuitems.filter(item => {
+        // Si es un subheader (navlabel), siempre mostrar
+        if (item.navlabel) return true;
+        
+        // Si no tiene roles definidos, mostrar a todos
+        if (!item.roles) return true;
+        
+        // Si tiene roles, solo mostrar si el rol del usuario está permitido
+        return userRole && item.roles.includes(userRole);
+    });
 
     return (
         <Box sx={{ px: "20px", overflowX: 'hidden' }}>
@@ -96,7 +111,7 @@ const SidebarItems = () => {
                 <Box sx={{ margin: "0 -24px" }}>
                     <Logo img="/images/logos/logo-dark.svg" component={Link} href="/" >Spike</Logo>
                 </Box>
-                {renderMenuItems(Menuitems, pathDirect)}
+                {renderMenuItems(filteredMenuItems, pathDirect)}
             </MUI_Sidebar>
             <Upgrade />
         </Box>
