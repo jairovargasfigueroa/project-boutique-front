@@ -59,7 +59,10 @@ const useCartStore = create<CartStore>()(
             producto,
             variante,
             cantidad,
-            precioUnitario: variante.precio || 0, // snapshot del precio
+            precioUnitario:
+              typeof variante.precio === "string"
+                ? parseFloat(variante.precio)
+                : variante.precio || 0, // snapshot del precio
           };
           set({ items: [...items, newItem] });
         }
