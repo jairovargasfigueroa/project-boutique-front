@@ -78,6 +78,32 @@ const Menuitems: MenuitemsType[] = [
 
   {
     navlabel: true,
+    subheader: "INTELIGENCIA ARTIFICIAL",
+  },
+
+  {
+    id: uniqueId(),
+    title: "Predicciones IA",
+    icon: "chart-2-line-duotone",
+    href: "/ia/predicciones",
+  },
+
+  {
+    id: uniqueId(),
+    title: "Alertas de Anomalías",
+    icon: "danger-triangle-line-duotone",
+    href: "/ia/alertas",
+  },
+
+  {
+    id: uniqueId(),
+    title: "Modelo IA",
+    icon: "cpu-bolt-line-duotone",
+    href: "/ia/modelo",
+  },
+
+  {
+    navlabel: true,
     subheader: "UTILITIES",
   },
 
