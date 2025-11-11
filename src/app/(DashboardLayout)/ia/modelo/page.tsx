@@ -99,12 +99,12 @@ const ModeloPage = () => {
 
   return (
     <PageContainer
-      title="Modelo de IA"
-      description="Información y gestión del modelo de Machine Learning"
+      title="Modelo de Inteligencia Artificial"
+      description="Gestiona y entrena el cerebro de las predicciones"
     >
       <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
         {/* Estado del Modelo */}
-        <DashboardCard title="Estado del Modelo">
+        <DashboardCard title="🤖 Estado del Modelo de IA">
           <CardContent>
             {loadingModelo && (
               <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
@@ -153,8 +153,16 @@ const ModeloPage = () => {
                   <>
                     <Divider sx={{ my: 2 }} />
 
-                    <Typography variant="h6" sx={{ mb: 2 }}>
-                      Métricas de Desempeño
+                    <Typography variant="h6" sx={{ mb: 1, fontWeight: "bold" }}>
+                      📊 ¿Qué tan preciso es el modelo?
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="textSecondary"
+                      sx={{ mb: 3 }}
+                    >
+                      Estas métricas miden qué tan bien la IA predice las ventas
+                      futuras
                     </Typography>
 
                     {/* R² Score */}
@@ -166,13 +174,19 @@ const ModeloPage = () => {
                           mb: 1,
                         }}
                       >
-                        <Typography variant="body2">
-                          R² Score (Precisión)
-                        </Typography>
+                        <Box>
+                          <Typography variant="body1" fontWeight="medium">
+                            🎯 Precisión General del Modelo
+                          </Typography>
+                          <Typography variant="caption" color="textSecondary">
+                            Mide qué tan bien predice (0% = malo, 100% =
+                            perfecto)
+                          </Typography>
+                        </Box>
                         <Box
                           sx={{ display: "flex", alignItems: "center", gap: 1 }}
                         >
-                          <Typography variant="body2" fontWeight="bold">
+                          <Typography variant="h6" fontWeight="bold">
                             {(metricas.r2_score * 100).toFixed(2)}%
                           </Typography>
                           <Chip
@@ -186,9 +200,17 @@ const ModeloPage = () => {
                         variant="determinate"
                         value={metricas.r2_score * 100}
                         color={getR2Color(metricas.r2_score) as any}
-                        sx={{ height: 8, borderRadius: 1 }}
+                        sx={{ height: 10, borderRadius: 5 }}
                       />
                     </Box>
+
+                    <Typography
+                      variant="body2"
+                      fontWeight="medium"
+                      sx={{ mb: 2 }}
+                    >
+                      📈 Métricas de Error (cuanto más bajo, mejor):
+                    </Typography>
 
                     {/* Otras Métricas */}
                     <Box
@@ -204,12 +226,15 @@ const ModeloPage = () => {
                         sx={{ flex: "1 1 calc(50% - 8px)" }}
                       >
                         <CardContent>
-                          <Typography variant="body2" color="textSecondary">
-                            MAE (Error Promedio)
+                          <Typography variant="caption" color="textSecondary">
+                            💰 Error Promedio en Bolivianos (MAE)
                           </Typography>
-                          <Typography variant="h6">
+                          <Typography variant="h6" sx={{ my: 1 }}>
                             Bs. {metricas.mae.toFixed(2)}
                           </Typography>
+                          <Typography variant="caption" color="textSecondary">
+                            Diferencia promedio entre predicción y realidad
+                          </Typography>
                         </CardContent>
                       </Card>
 
@@ -218,12 +243,15 @@ const ModeloPage = () => {
                         sx={{ flex: "1 1 calc(50% - 8px)" }}
                       >
                         <CardContent>
-                          <Typography variant="body2" color="textSecondary">
-                            MSE (Error Cuadrático)
+                          <Typography variant="caption" color="textSecondary">
+                            📊 Error Cuadrático (MSE)
                           </Typography>
-                          <Typography variant="h6">
+                          <Typography variant="h6" sx={{ my: 1 }}>
                             {metricas.mse.toFixed(2)}
                           </Typography>
+                          <Typography variant="caption" color="textSecondary">
+                            Penaliza más los errores grandes
+                          </Typography>
                         </CardContent>
                       </Card>
 
@@ -232,12 +260,15 @@ const ModeloPage = () => {
                         sx={{ flex: "1 1 calc(50% - 8px)" }}
                       >
                         <CardContent>
-                          <Typography variant="body2" color="textSecondary">
-                            Datos Entrenamiento
+                          <Typography variant="caption" color="textSecondary">
+                            🎓 Ventas usadas para Aprender
                           </Typography>
-                          <Typography variant="h6">
+                          <Typography variant="h6" sx={{ my: 1 }}>
                             {metricas.registros_entrenamiento}
                           </Typography>
+                          <Typography variant="caption" color="textSecondary">
+                            Datos históricos analizados por la IA
+                          </Typography>
                         </CardContent>
                       </Card>
 
@@ -246,18 +277,21 @@ const ModeloPage = () => {
                         sx={{ flex: "1 1 calc(50% - 8px)" }}
                       >
                         <CardContent>
-                          <Typography variant="body2" color="textSecondary">
-                            Datos Prueba
+                          <Typography variant="caption" color="textSecondary">
+                            ✅ Ventas usadas para Validar
                           </Typography>
-                          <Typography variant="h6">
+                          <Typography variant="h6" sx={{ my: 1 }}>
                             {metricas.registros_prueba}
+                          </Typography>
+                          <Typography variant="caption" color="textSecondary">
+                            Datos reservados para comprobar precisión
                           </Typography>
                         </CardContent>
                       </Card>
                     </Box>
 
                     <Typography variant="body2" color="textSecondary">
-                      Última actualización:{" "}
+                      🕒 Última actualización:{" "}
                       {new Date(metricas.fecha_entrenamiento).toLocaleString()}
                     </Typography>
                   </>
@@ -265,6 +299,9 @@ const ModeloPage = () => {
 
                 <Divider sx={{ my: 3 }} />
 
+                <Typography variant="body2" fontWeight="medium" sx={{ mb: 2 }}>
+                  ⚙️ Acciones disponibles:
+                </Typography>
                 <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
                   <Button
                     variant="contained"
@@ -272,17 +309,33 @@ const ModeloPage = () => {
                     onClick={() => setDialogOpen(true)}
                     disabled={entrenando}
                   >
-                    {entrenando ? "Entrenando..." : "Entrenar Modelo"}
+                    {entrenando ? "Entrenando..." : "🔄 Entrenar Modelo"}
                   </Button>
-
+                  <Typography
+                    variant="caption"
+                    color="textSecondary"
+                    sx={{ alignSelf: "center", maxWidth: 300 }}
+                  >
+                    Actualiza la IA con las ventas más recientes para mejorar
+                    las predicciones
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mt: 2 }}>
                   <Button
                     variant="outlined"
                     startIcon={<IconChartBar />}
                     onClick={handleDetectar}
                     disabled={!modeloActivo || detectando}
                   >
-                    {detectando ? "Detectando..." : "Detectar Anomalías"}
+                    {detectando ? "Detectando..." : "🔍 Detectar Anomalías"}
                   </Button>
+                  <Typography
+                    variant="caption"
+                    color="textSecondary"
+                    sx={{ alignSelf: "center", maxWidth: 300 }}
+                  >
+                    Busca ventas sospechosas o inusuales en los últimos 30 días
+                  </Typography>
                 </Box>
               </>
             )}
@@ -290,8 +343,13 @@ const ModeloPage = () => {
         </DashboardCard>
 
         {/* Historial de Entrenamientos */}
-        <DashboardCard title="Historial de Entrenamientos">
+        <DashboardCard title="📜 Historial de Entrenamientos">
           <CardContent>
+            <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+              Registro de todos los entrenamientos realizados. Cada vez que
+              entrenas, la IA aprende de tus nuevas ventas.
+            </Typography>
+
             {loadingHistory && (
               <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
                 <CircularProgress />
@@ -314,6 +372,9 @@ const ModeloPage = () => {
                       borderColor: "divider",
                       borderRadius: 1,
                       mb: 1,
+                      bgcolor: entrenamiento.activo
+                        ? "success.lighter"
+                        : "transparent",
                     }}
                   >
                     <ListItemText
@@ -325,33 +386,45 @@ const ModeloPage = () => {
                             alignItems: "center",
                           }}
                         >
-                          <Typography variant="body1">
-                            Versión {entrenamiento.version}
+                          <Typography variant="body1" fontWeight="medium">
+                            🤖 Modelo Versión {entrenamiento.version}
                           </Typography>
                           {entrenamiento.activo && (
-                            <Chip label="Activo" size="small" color="success" />
+                            <Chip
+                              label="✅ Activo"
+                              size="small"
+                              color="success"
+                            />
                           )}
                         </Box>
                       }
                       secondary={
                         <>
-                          <Typography variant="body2" color="textSecondary">
+                          <Typography
+                            variant="body2"
+                            color="textSecondary"
+                            sx={{ mt: 1 }}
+                          >
+                            📅 Entrenado el:{" "}
                             {new Date(
                               entrenamiento.fecha_entrenamiento
                             ).toLocaleString()}
                           </Typography>
                           <Typography variant="body2" color="textSecondary">
-                            R²: {parseFloat(entrenamiento.r2_score).toFixed(4)}{" "}
-                            | MAE: Bs.{" "}
+                            🎯 Precisión:{" "}
+                            {(parseFloat(entrenamiento.r2_score) * 100).toFixed(
+                              2
+                            )}
+                            % | 💰 Error Promedio: Bs.{" "}
                             {parseFloat(entrenamiento.mae).toFixed(2)}
                           </Typography>
                           {entrenamiento.notas && (
                             <Typography
                               variant="body2"
                               color="textSecondary"
-                              sx={{ mt: 0.5 }}
+                              sx={{ mt: 0.5, fontStyle: "italic" }}
                             >
-                              {entrenamiento.notas}
+                              📝 {entrenamiento.notas}
                             </Typography>
                           )}
                         </>
@@ -366,7 +439,8 @@ const ModeloPage = () => {
               !errorHistory &&
               entrenamientos.length === 0 && (
                 <Alert severity="info">
-                  No hay historial de entrenamientos.
+                  ℹ️ No hay historial de entrenamientos. Entrena el modelo por
+                  primera vez para empezar a ver predicciones.
                 </Alert>
               )}
           </CardContent>

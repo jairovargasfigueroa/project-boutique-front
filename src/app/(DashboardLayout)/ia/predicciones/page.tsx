@@ -63,11 +63,11 @@ const PrediccionesPage = () => {
 
   return (
     <PageContainer
-      title="Predicciones IA"
-      description="Predicciones de ventas con Inteligencia Artificial"
+      title="Predicciones de Ventas con IA"
+      description="¿Cuánto venderás en el futuro? La IA te lo predice"
     >
       <Box>
-        <DashboardCard title="Predicciones de Ventas">
+        <DashboardCard title="🔮 Predicciones Inteligentes de Ventas">
           <CardContent>
             {/* Controles */}
             <Box
@@ -76,11 +76,18 @@ const PrediccionesPage = () => {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                flexWrap: "wrap",
+                gap: 2,
               }}
             >
-              <Typography variant="body2" color="textSecondary">
-                Predicciones generadas con modelos de Machine Learning
-              </Typography>
+              <Box>
+                <Typography variant="body1" fontWeight="medium" sx={{ mb: 0.5 }}>
+                  Predicciones generadas por Inteligencia Artificial
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  Selecciona el periodo para ver las predicciones semanales o mensuales
+                </Typography>
+              </Box>
               <ToggleButtonGroup
                 value={periodo}
                 exclusive
@@ -88,8 +95,8 @@ const PrediccionesPage = () => {
                 size="small"
                 color="primary"
               >
-                <ToggleButton value="semanal">Semanal</ToggleButton>
-                <ToggleButton value="mensual">Mensual</ToggleButton>
+                <ToggleButton value="semanal">📅 Semanal</ToggleButton>
+                <ToggleButton value="mensual">📆 Mensual</ToggleButton>
               </ToggleButtonGroup>
             </Box>
 
@@ -109,94 +116,160 @@ const PrediccionesPage = () => {
 
             {/* Predicciones */}
             {!loading && !error && predicciones.length > 0 && (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-                {predicciones.map((prediccion, index) => (
-                  <Box
-                    key={index}
-                    sx={{ flex: "1 1 calc(25% - 16px)", minWidth: "250px" }}
-                  >
-                    <Card
-                      variant="outlined"
-                      sx={{
-                        borderColor:
-                          prediccion.tendencia === "alza"
-                            ? "success.main"
-                            : prediccion.tendencia === "baja"
-                            ? "error.main"
-                            : "grey.300",
-                        borderWidth: 2,
-                      }}
+              <>
+                <Typography variant="h6" sx={{ mb: 2, fontWeight: "bold" }}>
+                  📊 Predicciones de Ventas Futuras
+                </Typography>
+                <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>
+                  La Inteligencia Artificial analiza tus ventas pasadas y predice cuánto
+                  venderás en las próximas semanas o meses. Cada cuadro representa un
+                  periodo de tiempo futuro.
+                </Typography>
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+                  {predicciones.map((prediccion, index) => (
+                    <Box
+                      key={index}
+                      sx={{ flex: "1 1 calc(25% - 16px)", minWidth: "250px" }}
                     >
-                      <CardContent>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            mb: 1,
-                          }}
-                        >
-                          <Typography variant="caption" color="textSecondary">
-                            {prediccion.periodo}
-                          </Typography>
-                          {getTendenciaIcon(prediccion.tendencia)}
-                        </Box>
-
-                        <Typography variant="h4" sx={{ mb: 1 }}>
-                          Bs.{" "}
-                          {parseFloat(prediccion.ventas_predichas).toFixed(2)}
-                        </Typography>
-
-                        <Typography
-                          variant="body2"
-                          color="textSecondary"
-                          sx={{ mb: 1 }}
-                        >
-                          ~{prediccion.cantidad_ventas_predichas} ventas
-                        </Typography>
-
-                        <Box sx={{ mb: 1 }}>
+                      <Card
+                        variant="outlined"
+                        sx={{
+                          borderColor:
+                            prediccion.tendencia === "alza"
+                              ? "success.main"
+                              : prediccion.tendencia === "baja"
+                              ? "error.main"
+                              : "grey.300",
+                          borderWidth: 2,
+                          height: "100%",
+                        }}
+                      >
+                        <CardContent>
+                          {/* Encabezado con periodo */}
                           <Box
                             sx={{
                               display: "flex",
                               justifyContent: "space-between",
-                              mb: 0.5,
+                              alignItems: "center",
+                              mb: 2,
+                              pb: 1,
+                              borderBottom: "1px solid",
+                              borderColor: "divider",
                             }}
                           >
-                            <Typography variant="caption" color="textSecondary">
-                              Confianza
+                            <Typography variant="h6" fontWeight="bold">
+                              {prediccion.periodo}
                             </Typography>
-                            <Typography variant="caption" color="textSecondary">
-                              {(prediccion.confianza * 100).toFixed(0)}%
+                            {getTendenciaIcon(prediccion.tendencia)}
+                          </Box>
+
+                          {/* Monto predicho - Destacado */}
+                          <Box sx={{ mb: 2 }}>
+                            <Typography
+                              variant="caption"
+                              color="textSecondary"
+                              sx={{ display: "block", mb: 0.5 }}
+                            >
+                              💰 Ventas Estimadas:
+                            </Typography>
+                            <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+                              Bs.{" "}
+                              {parseFloat(prediccion.ventas_predichas).toFixed(2)}
                             </Typography>
                           </Box>
-                          <LinearProgress
-                            variant="determinate"
-                            value={prediccion.confianza * 100}
-                            color={
-                              prediccion.confianza > 0.8 ? "success" : "warning"
-                            }
-                          />
-                        </Box>
 
-                        <Chip
-                          label={prediccion.tendencia.toUpperCase()}
-                          size="small"
-                          color={getTendenciaColor(prediccion.tendencia) as any}
-                          sx={{ width: "100%" }}
-                        />
-                      </CardContent>
-                    </Card>
-                  </Box>
-                ))}
-              </Box>
+                          {/* Cantidad de ventas */}
+                          <Box sx={{ mb: 2 }}>
+                            <Typography
+                              variant="caption"
+                              color="textSecondary"
+                              sx={{ display: "block", mb: 0.5 }}
+                            >
+                              🛒 Número de Transacciones:
+                            </Typography>
+                            <Typography variant="body1" fontWeight="medium">
+                              ~{prediccion.cantidad_ventas_predichas} ventas
+                            </Typography>
+                          </Box>
+
+                          {/* Barra de confianza */}
+                          <Box sx={{ mb: 2 }}>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                mb: 0.5,
+                              }}
+                            >
+                              <Typography
+                                variant="caption"
+                                color="textSecondary"
+                              >
+                                📈 Nivel de Confianza de la IA:
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                fontWeight="bold"
+                                color={
+                                  prediccion.confianza > 0.8
+                                    ? "success.main"
+                                    : "warning.main"
+                                }
+                              >
+                                {(prediccion.confianza * 100).toFixed(0)}%
+                              </Typography>
+                            </Box>
+                            <LinearProgress
+                              variant="determinate"
+                              value={prediccion.confianza * 100}
+                              color={
+                                prediccion.confianza > 0.8 ? "success" : "warning"
+                              }
+                              sx={{ height: 8, borderRadius: 4 }}
+                            />
+                            <Typography
+                              variant="caption"
+                              color="textSecondary"
+                              sx={{ display: "block", mt: 0.5, fontSize: "0.7rem" }}
+                            >
+                              {prediccion.confianza > 0.8
+                                ? "Alta precisión en la predicción"
+                                : "Precisión moderada, usar como referencia"}
+                            </Typography>
+                          </Box>
+
+                          {/* Chip de tendencia */}
+                          <Chip
+                            label={
+                              prediccion.tendencia === "alza"
+                                ? "📈 TENDENCIA AL ALZA"
+                                : prediccion.tendencia === "baja"
+                                ? "📉 TENDENCIA A LA BAJA"
+                                : "➡️ TENDENCIA ESTABLE"
+                            }
+                            size="small"
+                            color={getTendenciaColor(prediccion.tendencia) as any}
+                            sx={{ width: "100%", fontWeight: "bold" }}
+                          />
+                        </CardContent>
+                      </Card>
+                    </Box>
+                  ))}
+                </Box>
+              </>
             )}
 
             {/* Sin predicciones */}
             {!loading && !error && predicciones.length === 0 && (
-              <Alert severity="info">
-                No hay predicciones disponibles. El modelo necesita ser
-                entrenado.
+              <Alert severity="info" sx={{ mt: 2 }}>
+                <Typography variant="body1" fontWeight="medium" sx={{ mb: 1 }}>
+                  ℹ️ No hay predicciones disponibles
+                </Typography>
+                <Typography variant="body2">
+                  Para ver predicciones de ventas futuras, primero debes entrenar el
+                  modelo de Inteligencia Artificial. Ve a la sección "Modelo de IA" y
+                  haz clic en "Entrenar Modelo".
+                </Typography>
               </Alert>
             )}
           </CardContent>

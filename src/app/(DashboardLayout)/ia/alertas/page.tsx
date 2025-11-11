@@ -126,11 +126,18 @@ const AlertasPage = () => {
   return (
     <PageContainer
       title="Alertas de Anomalías"
-      description="Alertas detectadas por el sistema de IA"
+      description="La IA detectó ventas sospechosas o inusuales"
     >
       <Box>
-        <DashboardCard title="Alertas de Anomalías">
+        <DashboardCard title="🚨 Alertas de Ventas Anómalas">
           <CardContent>
+            <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>
+              La Inteligencia Artificial revisa constantemente tus ventas y te
+              alerta cuando detecta patrones inusuales, precios muy altos o
+              bajos, cantidades extrañas, o comportamientos sospechosos que
+              podrían indicar errores o fraude.
+            </Typography>
+
             {/* Controles */}
             <Box
               sx={{
@@ -138,25 +145,28 @@ const AlertasPage = () => {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                flexWrap: "wrap",
+                gap: 2,
               }}
             >
               <FormControl size="small" sx={{ minWidth: 200 }}>
-                <InputLabel>Filtrar por estado</InputLabel>
+                <InputLabel>🔍 Filtrar por estado</InputLabel>
                 <Select
                   value={filtroEstado}
                   onChange={(e) => setFiltroEstado(e.target.value as any)}
-                  label="Filtrar por estado"
+                  label="🔍 Filtrar por estado"
                 >
-                  <MenuItem value="">Todos</MenuItem>
-                  <MenuItem value="nueva">Nuevas</MenuItem>
-                  <MenuItem value="revisada">Revisadas</MenuItem>
-                  <MenuItem value="resuelta">Resueltas</MenuItem>
-                  <MenuItem value="ignorada">Ignoradas</MenuItem>
+                  <MenuItem value="">📋 Todos</MenuItem>
+                  <MenuItem value="nueva">🆕 Nuevas</MenuItem>
+                  <MenuItem value="revisada">👁️ Revisadas</MenuItem>
+                  <MenuItem value="resuelta">✅ Resueltas</MenuItem>
+                  <MenuItem value="ignorada">🚫 Ignoradas</MenuItem>
                 </Select>
               </FormControl>
 
-              <Typography variant="body2" color="textSecondary">
-                {alertas.length} alerta{alertas.length !== 1 ? "s" : ""}
+              <Typography variant="body1" fontWeight="medium">
+                {alertas.length} alerta{alertas.length !== 1 ? "s" : ""}{" "}
+                encontrada{alertas.length !== 1 ? "s" : ""}
               </Typography>
             </Box>
 
@@ -249,22 +259,57 @@ const AlertasPage = () => {
                           </Box>
 
                           <Box
-                            sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}
+                            sx={{
+                              display: "flex",
+                              gap: 2,
+                              flexWrap: "wrap",
+                              mb: 1,
+                            }}
                           >
                             <Typography
                               variant="body2"
                               color="error"
                               fontWeight="bold"
                             >
-                              Real: Bs.{" "}
+                              💵 Valor Real: Bs.{" "}
                               {parseFloat(alerta.valor_real).toFixed(2)}
                             </Typography>
                             <Typography variant="body2" color="textSecondary">
-                              Esperado: Bs.{" "}
+                              📊 Valor Esperado: Bs.{" "}
                               {parseFloat(alerta.valor_esperado).toFixed(2)}
                             </Typography>
-                            <Typography variant="body2" color="textSecondary">
-                              Score: {alerta.score_anomalia.toFixed(2)}
+                          </Box>
+                          <Box>
+                            <Typography
+                              variant="caption"
+                              color="textSecondary"
+                              sx={{ display: "block", mb: 0.5 }}
+                            >
+                              ⚠️ Nivel de Anomalía:
+                            </Typography>
+                            <Chip
+                              label={`${alerta.score_anomalia.toFixed(
+                                2
+                              )} puntos`}
+                              size="small"
+                              color={
+                                alerta.score_anomalia > 3
+                                  ? "error"
+                                  : alerta.score_anomalia > 2
+                                  ? "warning"
+                                  : "default"
+                              }
+                            />
+                            <Typography
+                              variant="caption"
+                              color="textSecondary"
+                              sx={{ display: "block", mt: 0.5 }}
+                            >
+                              {alerta.score_anomalia > 3
+                                ? "Muy anómalo - revisar urgente"
+                                : alerta.score_anomalia > 2
+                                ? "Moderadamente anómalo"
+                                : "Ligeramente anómalo"}
                             </Typography>
                           </Box>
 
@@ -295,8 +340,15 @@ const AlertasPage = () => {
             {/* Sin alertas */}
             {!loading && !error && alertas.length === 0 && (
               <Alert severity="success">
-                No hay alertas
-                {filtroEstado ? ` en estado "${filtroEstado}"` : ""}.
+                <Typography variant="body1" fontWeight="medium">
+                  ✅ ¡Todo en orden!
+                </Typography>
+                <Typography variant="body2">
+                  No se encontraron alertas
+                  {filtroEstado ? ` en estado "${filtroEstado}"` : ""}.
+                  {!filtroEstado &&
+                    " La IA no detectó ninguna venta sospechosa o inusual."}
+                </Typography>
               </Alert>
             )}
           </CardContent>
@@ -309,34 +361,44 @@ const AlertasPage = () => {
           maxWidth="sm"
           fullWidth
         >
-          <DialogTitle>Actualizar Alerta</DialogTitle>
+          <DialogTitle>✏️ Actualizar Estado de la Alerta</DialogTitle>
           <DialogContent>
+            <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+              Cambia el estado de la alerta según las acciones que hayas tomado
+            </Typography>
             <Box
               sx={{ pt: 2, display: "flex", flexDirection: "column", gap: 2 }}
             >
               <FormControl fullWidth>
-                <InputLabel>Estado</InputLabel>
+                <InputLabel>Estado de la Alerta</InputLabel>
                 <Select
                   value={nuevoEstado}
                   onChange={(e) =>
                     setNuevoEstado(e.target.value as EstadoAlerta)
                   }
-                  label="Estado"
+                  label="Estado de la Alerta"
                 >
-                  <MenuItem value="revisada">Revisada</MenuItem>
-                  <MenuItem value="resuelta">Resuelta</MenuItem>
-                  <MenuItem value="ignorada">Ignorada</MenuItem>
+                  <MenuItem value="revisada">
+                    👁️ Revisada - La he visto pero aún no resuelvo
+                  </MenuItem>
+                  <MenuItem value="resuelta">
+                    ✅ Resuelta - Ya corregí el problema
+                  </MenuItem>
+                  <MenuItem value="ignorada">
+                    🚫 Ignorar - Es un falso positivo
+                  </MenuItem>
                 </Select>
               </FormControl>
 
               <TextField
-                label="Nota de Resolución"
+                label="Nota de Resolución (opcional)"
                 multiline
                 rows={4}
                 value={notaResolucion}
                 onChange={(e) => setNotaResolucion(e.target.value)}
-                placeholder="Describe la acción tomada o razón del cambio de estado..."
+                placeholder="Ejemplo: 'Cliente devolvió el producto' o 'Era una promoción especial' o 'Error corregido en el sistema'..."
                 fullWidth
+                helperText="Describe qué hiciste o por qué cambias el estado"
               />
             </Box>
           </DialogContent>
@@ -347,7 +409,7 @@ const AlertasPage = () => {
               variant="contained"
               disabled={updating}
             >
-              {updating ? <CircularProgress size={24} /> : "Actualizar"}
+              {updating ? <CircularProgress size={24} /> : "💾 Guardar Cambios"}
             </Button>
           </DialogActions>
         </Dialog>
