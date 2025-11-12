@@ -45,25 +45,24 @@ const ProductosTable = ({
       label: "Imagen",
       align: "center" as const,
       render: (value: string | null) => (
-        <Avatar 
-          src={value || undefined} 
-          alt="Producto" 
+        <Avatar
+          src={value || undefined}
+          alt="Producto"
           sx={{ width: 40, height: 40 }}
           imgProps={{
             onError: (e: any) => {
               // Si falla la carga, mostrar inicial
-              e.target.style.display = 'none';
-            }
+              e.target.style.display = "none";
+            },
           }}
         >
-          {/* Mostrar inicial del producto si no hay imagen o falla */}
-          P
+          {/* Mostrar inicial del producto si no hay imagen o falla */}P
         </Avatar>
       ),
     },
     {
       key: "nombre",
-      label: "Nombre del Producto",
+      label: "Producto",
     },
     {
       key: "marca",
@@ -89,7 +88,13 @@ const ProductosTable = ({
       render: (value: number | undefined) => (
         <Chip
           label={value !== undefined ? value : 0}
-          color={value && value > 10 ? "success" : value && value > 0 ? "warning" : "error"}
+          color={
+            value && value > 10
+              ? "success"
+              : value && value > 0
+              ? "warning"
+              : "error"
+          }
           size="small"
         />
       ),

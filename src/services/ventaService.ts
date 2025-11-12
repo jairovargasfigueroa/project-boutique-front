@@ -66,6 +66,14 @@ export const ventaService = {
     return response.data;
   },
 
+  // Cancelar venta
+  cancelar: async (id: number) => {
+    const response = await apiClient.patch<Venta>(`${ENDPOINT}${id}/`, {
+      estado: "cancelada",
+    });
+    return response.data;
+  },
+
   // Métodos auxiliares (mantener compatibilidad)
   update: async (id: number, venta: Partial<Venta>) => {
     const response = await apiClient.put<Venta>(`${ENDPOINT}${id}/`, venta);

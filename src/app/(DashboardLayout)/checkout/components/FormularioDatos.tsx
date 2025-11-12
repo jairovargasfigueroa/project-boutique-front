@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { usuarioService, UsuarioListItem } from "@/services/usuarioService";
+import { useClientes } from "@/hooks";
 
 interface DatosCliente {
   cliente: string;
@@ -41,29 +42,10 @@ export default function FormularioDatos({
     ciudad: initialValues?.ciudad || "",
   });
 
-  const [clientes, setClientes] = useState<UsuarioListItem[]>([]);
-  const [loadingClientes, setLoadingClientes] = useState(false);
+  // Usar el hook para cargar clientes
+  const { clientes, loading: loadingClientes } = useClientes();
   const [selectedCliente, setSelectedCliente] =
     useState<UsuarioListItem | null>(null);
-
-  // Cargar lista de clientes
-  useEffect(() => {
-    const cargarClientes = async () => {
-      try {
-        setLoadingClientes(true);
-        const data = await usuarioService.getClientes();
-        setClientes(data);
-      } catch (error) {
-        console.error("Error al cargar clientes:", error);
-      } finally {
-        setLoadingClientes(false);
-      }
-    };
-
-    if (!disabled) {
-      cargarClientes();
-    }
-  }, [disabled]);
 
   const handleChange =
     (field: keyof DatosCliente) =>
