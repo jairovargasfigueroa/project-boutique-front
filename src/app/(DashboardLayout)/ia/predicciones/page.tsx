@@ -267,8 +267,8 @@ const PrediccionesPage = () => {
                 </Typography>
                 <Typography variant="body2">
                   Para ver predicciones de ventas futuras, primero debes entrenar el
-                  modelo de Inteligencia Artificial. Ve a la sección "Modelo de IA" y
-                  haz clic en "Entrenar Modelo".
+                  modelo de Inteligencia Artificial. Ve a la sección &quot;Modelo de IA&quot; y
+                  haz clic en &quot;Entrenar Modelo&quot;.
                 </Typography>
               </Alert>
             )}

@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import {
   Typography,
   Box,
@@ -63,9 +64,11 @@ const TopProductos = ({ productos }: Props) => {
                       }}
                     >
                       {producto.imagen ? (
-                        <img
+                        <Image
                           src={producto.imagen}
                           alt={producto.nombre}
+                          width={40}
+                          height={40}
                           style={{
                             width: "100%",
                             height: "100%",

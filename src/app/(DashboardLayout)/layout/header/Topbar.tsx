@@ -3,6 +3,7 @@ import { Box, AppBar, Toolbar, styled, Stack, Button } from "@mui/material";
 import { IconLifebuoy, IconGift, IconBriefcase } from "@tabler/icons-react";
 import { Typography } from "@mui/material";
 import Link from "next/link";
+import Image from "next/image";
 import { Icon } from "@iconify/react";
 import LivePreviewDropdown from "./LivePreviewDropdown";
 
@@ -48,7 +49,7 @@ const Topbar = () => {
           }}
         >
           <Link href="https://www.wrappixel.com/" style={{ display: "flex" }}>
-            <img src="/images/logos/logo-wrappixel.svg" width={147} alt="logo" />
+            <Image src="/images/logos/logo-wrappixel.svg" width={147} height={40} alt="logo" />
           </Link>
           <Stack
 

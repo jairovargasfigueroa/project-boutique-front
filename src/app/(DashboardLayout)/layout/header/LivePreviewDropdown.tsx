@@ -6,6 +6,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { Icon } from "@iconify/react";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import Link from "next/link";
+import Image from "next/image";
 import { colors } from '@mui/material';
 // import { IconExternalLink } from '@tabler/icons-react';
 
@@ -139,7 +140,7 @@ const LivePreviewDropdown: React.FC = () => {
                 {MenuItems.map((item) => (
                     <StyledLink key={item.id} href={item.href} target='blank'>
                         <MenuItem sx={{ gap: '12px', borderRadius: '7px', padding: '12px 18px', ":hover": { backgroundColor: "#000c290d" } }} onClick={handleClose} disableRipple>
-                            <img src={item.img} width={18} alt="logo" />
+                            <Image src={item.img} width={18} height={18} alt="logo" />
                             {item.title} 
                         </MenuItem>
                     </StyledLink>
