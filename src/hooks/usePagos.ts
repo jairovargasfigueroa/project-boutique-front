@@ -28,12 +28,12 @@ export const usePagos = (ventaId?: number) => {
     }
   }, [ventaId]);
 
-  const registrarPago = async (request: RegistrarPagoRequest) => {
+  const registrarPago = useCallback(async (request: RegistrarPagoRequest) => {
     try {
       setLoading(true);
       setError(null);
       const result = await pagoService.registrarPago(request);
-      await cargarPagos(); // Recargar pagos después de registrar
+      // No recargar automáticamente, dejar que el componente decida
       return result;
     } catch (err: any) {
       console.error("Error al registrar pago:", err);
@@ -63,7 +63,7 @@ export const usePagos = (ventaId?: number) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (ventaId) {

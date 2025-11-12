@@ -3,6 +3,7 @@ export * from "./useVentas";
 export * from "./useCuotas";
 export * from "./usePagos";
 export * from "./useProductos";
+export * from "./useProductoDetalle";
 export * from "./useVariantes";
 export * from "./useReportes";
 export * from "./useConsultaNatural";

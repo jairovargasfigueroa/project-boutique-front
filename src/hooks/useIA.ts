@@ -19,6 +19,9 @@ export const usePredictGeneral = (params?: PredictGeneralParams) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // ✅ Serializar params para comparar por valor
+  const paramsString = JSON.stringify(params);
+
   const fetchPredicciones = useCallback(async () => {
     try {
       setLoading(true);
@@ -32,7 +35,7 @@ export const usePredictGeneral = (params?: PredictGeneralParams) => {
     } finally {
       setLoading(false);
     }
-  }, [params]);
+  }, [paramsString]); // ← Depende del string, no del objeto
 
   useEffect(() => {
     fetchPredicciones();
@@ -48,6 +51,9 @@ export const usePredictProducto = (
   const [predicciones, setPredicciones] = useState<PrediccionProducto[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // ✅ Serializar params para comparar por valor
+  const paramsString = JSON.stringify(params);
 
   const fetchPredicciones = useCallback(async () => {
     if (!productoId) return;
@@ -66,7 +72,7 @@ export const usePredictProducto = (
     } finally {
       setLoading(false);
     }
-  }, [productoId, params]);
+  }, [productoId, paramsString]); // ← Depende del string, no del objeto
 
   useEffect(() => {
     if (productoId) {
@@ -82,6 +88,9 @@ export const useAlertas = (params?: AlertasParams) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // ✅ Serializar params para comparar por valor
+  const paramsString = JSON.stringify(params);
+
   const fetchAlertas = useCallback(async () => {
     try {
       setLoading(true);
@@ -93,9 +102,9 @@ export const useAlertas = (params?: AlertasParams) => {
     } finally {
       setLoading(false);
     }
-  }, [params]);
+  }, [paramsString]); // ← Depende del string, no del objeto
 
-  const updateAlerta = async (
+  const updateAlerta = useCallback(async (
     alertaId: number,
     updateData: UpdateAlertaRequest
   ) => {
@@ -118,7 +127,7 @@ export const useAlertas = (params?: AlertasParams) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchAlertas();
@@ -151,7 +160,7 @@ export const useModeloInfo = () => {
     }
   }, []);
 
-  const entrenarModelo = async () => {
+  const entrenarModelo = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -165,7 +174,7 @@ export const useModeloInfo = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [fetchModeloInfo]);
 
   useEffect(() => {
     fetchModeloInfo();
@@ -214,7 +223,7 @@ export const useDetectarAnomalias = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const detectar = async (data?: DetectarAnomaliasRequest) => {
+  const detectar = useCallback(async (data?: DetectarAnomaliasRequest) => {
     try {
       setLoading(true);
       setError(null);
@@ -228,7 +237,7 @@ export const useDetectarAnomalias = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   return { detectar, loading, error };
 };
