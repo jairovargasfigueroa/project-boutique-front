@@ -64,9 +64,10 @@ export interface VarianteProductoUpdate {
 
 // Filtros para productos
 export interface FiltrosProducto {
+  search?: string;
   categoria?: number;
   marca?: string;
-  genero?: 'Hombre' | 'Mujer' | 'Unisex';
+  genero?: "Hombre" | "Mujer" | "Unisex";
   talla?: string;
   precio_min?: number;
   precio_max?: number;

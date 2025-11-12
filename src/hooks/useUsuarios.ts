@@ -67,3 +67,35 @@ export const useUsuarios = (rol?: string) => {
     eliminarUsuario,
   };
 };
+
+// Hook específico para clientes (usuarios con rol 'cliente')
+export const useClientes = () => {
+  const [clientes, setClientes] = useState<UsuarioListItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const cargarClientes = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await usuarioService.getAll('cliente');
+      setClientes(data);
+    } catch (err: any) {
+      console.error('Error al cargar clientes:', err);
+      setError(err.response?.data?.error || 'Error al cargar clientes');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    cargarClientes();
+  }, []);
+
+  return {
+    clientes,
+    loading,
+    error,
+    refetch: cargarClientes,
+  };
+};

@@ -2,11 +2,19 @@
 import React, { useState } from "react";
 import { Box } from "@mui/material";
 import { useProductos } from "@/hooks/useProductos";
-import { Producto, ProductoCreate, ProductoUpdate } from "@/types/productos";
+import {
+  Producto,
+  ProductoCreate,
+  ProductoUpdate,
+  FiltrosProducto,
+} from "@/types/productos";
 import ProductosTable from "./components/ProductosTable";
 import ProductoDialog from "./components/ProductoDialog";
+import FiltrosSidebar from "./components/FiltrosSidebar";
+import FiltrosActivos from "./components/FiltrosActivos";
 
 export default function ProductosPage() {
+  const [filtros, setFiltros] = useState<FiltrosProducto>({});
   const {
     productos,
     loading,
@@ -15,7 +23,7 @@ export default function ProductosPage() {
     updateProducto,
     deleteProducto,
     refetch,
-  } = useProductos();
+  } = useProductos(filtros);
 
   const [openDialog, setOpenDialog] = useState(false);
   const [modo, setModo] = useState<"create" | "edit">("create");
@@ -53,59 +61,85 @@ export default function ProductosPage() {
     refetch();
   };
 
-  // const handleClearFilters = () => {
-  //   setFilterNombre('');
-  //   setFilterCategoria('');
-  // };
+  const handleFiltrosChange = (nuevosFiltros: FiltrosProducto) => {
+    setFiltros(nuevosFiltros);
+  };
+
+  const handleLimpiarFiltros = () => {
+    setFiltros({});
+  };
+
+  const handleEliminarFiltro = (key: keyof FiltrosProducto) => {
+    const newFiltros = { ...filtros };
+    delete newFiltros[key];
+
+    // Si es precio_min, también eliminar precio_max
+    if (key === "precio_min" && "precio_max" in newFiltros) {
+      delete newFiltros.precio_max;
+    }
+
+    setFiltros(newFiltros);
+  };
 
   return (
-    <Box>
-      {/* <FiltrosProducto
-        filterNombre={filterNombre}
-        setFilterNombre={setFilterNombre}
-        filterCategoria={filterCategoria}
-        setFilterCategoria={setFilterCategoria}
-        onClear={handleClearFilters}
-      /> */}
+    <Box sx={{ display: "flex", gap: 3, p: 3 }}>
+      {/* SIDEBAR - Filtros */}
+      <Box sx={{ width: 280, flexShrink: 0 }}>
+        <FiltrosSidebar
+          filtros={filtros}
+          onChange={handleFiltrosChange}
+          onLimpiar={handleLimpiarFiltros}
+        />
+      </Box>
 
-      <ProductosTable
-        productos={productos}
-        loading={loading}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onCreate={handleNew}
-      />
+      {/* ÁREA PRINCIPAL - Productos */}
+      <Box sx={{ flex: 1 }}>
+        {/* Filtros Activos */}
+        <FiltrosActivos
+          filtros={filtros}
+          onEliminar={handleEliminarFiltro}
+          onLimpiarTodo={handleLimpiarFiltros}
+        />
 
-      {/* <PaginadorTabla
-        page={page}
-        pageSize={pageSize}
-        total={total}
-        onPageChange={setPage}
-      /> */}
+        <ProductosTable
+          productos={productos}
+          loading={loading}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onCreate={handleNew}
+        />
 
-      {error && (
-        <Box color="error.main" mt={2}>
-          Error: {error}
-        </Box>
-      )}
+        {/* <PaginadorTabla
+          page={page}
+          pageSize={pageSize}
+          total={total}
+          onPageChange={setPage}
+        /> */}
 
-      <ProductoDialog
-        open={openDialog}
-        mode={modo}
-        initialData={
-          productoSeleccionado
-            ? {
-                nombre: productoSeleccionado.nombre,
-                descripcion: productoSeleccionado.descripcion,
-                genero: productoSeleccionado.genero,
-                marca: productoSeleccionado.marca,
-                categoria: productoSeleccionado.categoria,
-              }
-            : undefined
-        }
-        onClose={() => setOpenDialog(false)}
-        onSubmit={handleSubmit}
-      />
+        {error && (
+          <Box color="error.main" mt={2}>
+            Error: {error}
+          </Box>
+        )}
+
+        <ProductoDialog
+          open={openDialog}
+          mode={modo}
+          initialData={
+            productoSeleccionado
+              ? {
+                  nombre: productoSeleccionado.nombre,
+                  descripcion: productoSeleccionado.descripcion,
+                  genero: productoSeleccionado.genero,
+                  marca: productoSeleccionado.marca,
+                  categoria: productoSeleccionado.categoria,
+                }
+              : undefined
+          }
+          onClose={() => setOpenDialog(false)}
+          onSubmit={handleSubmit}
+        />
+      </Box>
     </Box>
   );
 }
