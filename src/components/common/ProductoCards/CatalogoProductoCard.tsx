@@ -2,6 +2,7 @@
 "use client";
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { CardContent, Typography, Rating, Tooltip, Fab } from "@mui/material";
 import { Stack } from "@mui/system";
 import { IconBasket } from "@tabler/icons-react";
@@ -26,14 +27,16 @@ export default function ProductCard({
   return (
     <BlankCard>
       <Typography component={Link} href={linkUrl}>
-        <img
+        <Image
           src={imageSrc}
           alt={producto.nombre}
+          width={300}
+          height={250}
+          style={{ width: "100%", height: "250px", objectFit: "cover" }}
           onError={(e) => {
             e.currentTarget.src =
               "https://placehold.co/300x250/e3e3e3/999999?text=Producto";
           }}
-          style={{ width: "100%", height: "250px", objectFit: "cover" }}
         />
       </Typography>
 

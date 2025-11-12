@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { Venta, CrearVentaRequest } from "@/types/ventas";
 import { ventaService } from "@/services/ventaService";
 
@@ -8,7 +8,7 @@ export const useVentas = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const cargarVentas = async () => {
+  const cargarVentas = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -20,11 +20,11 @@ export const useVentas = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     cargarVentas();
-  }, []);
+  }, [cargarVentas]);
 
   return {
     ventas,
@@ -39,7 +39,7 @@ export const useVentaDetalle = (ventaId?: number) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const cargarVenta = async () => {
+  const cargarVenta = useCallback(async () => {
     if (!ventaId) return;
 
     try {
@@ -53,7 +53,7 @@ export const useVentaDetalle = (ventaId?: number) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [ventaId]);
 
   const obtenerVenta = async (id: number) => {
     try {
@@ -114,7 +114,7 @@ export const useVentaDetalle = (ventaId?: number) => {
     if (ventaId) {
       cargarVenta();
     }
-  }, [ventaId]);
+  }, [ventaId, cargarVenta]);
 
   return {
     venta,

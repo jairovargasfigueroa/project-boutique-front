@@ -8,7 +8,7 @@ import {
   ProductoUpdate,
   FiltrosProducto,
 } from "@/types/productos";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export const useProductos = (filtros?: FiltrosProducto) => {
   const [productos, setProductos] = useState<Producto[]>([]);
@@ -18,7 +18,7 @@ export const useProductos = (filtros?: FiltrosProducto) => {
   const [loadingVariantes, setLoadingVariantes] = useState(false);
 
   // Cargar productos
-  const fetchProductos = async () => {
+  const fetchProductos = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -32,7 +32,7 @@ export const useProductos = (filtros?: FiltrosProducto) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filtros]);
 
   const createProducto = async (data: ProductoCreate) => {
     try {
@@ -111,7 +111,7 @@ export const useProductos = (filtros?: FiltrosProducto) => {
   // Cargar productos al montar el componente y cuando cambien los filtros
   useEffect(() => {
     fetchProductos();
-  }, [JSON.stringify(filtros)]);
+  }, [fetchProductos]);
 
   return {
     // Estado

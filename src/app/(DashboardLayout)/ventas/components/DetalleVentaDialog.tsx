@@ -68,7 +68,7 @@ const DetalleVentaDialog = ({
       }
       refetchPagos();
     }
-  }, [open, ventaInicial?.id]);
+  }, [open, ventaInicial, refetchVenta, refetchCuotas, refetchPagos]);
 
   const handleRefreshAll = async () => {
     await Promise.all([refetchVenta(), refetchCuotas(), refetchPagos()]);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type {
   Pago,
   PagarCuotaRequest,
@@ -12,7 +12,7 @@ export const usePagos = (ventaId?: number) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const cargarPagos = async () => {
+  const cargarPagos = useCallback(async () => {
     if (!ventaId) return;
 
     try {
@@ -26,7 +26,7 @@ export const usePagos = (ventaId?: number) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [ventaId]);
 
   const registrarPago = async (request: RegistrarPagoRequest) => {
     try {
@@ -69,7 +69,7 @@ export const usePagos = (ventaId?: number) => {
     if (ventaId) {
       cargarPagos();
     }
-  }, [ventaId]);
+  }, [ventaId, cargarPagos]);
 
   return {
     pagos,

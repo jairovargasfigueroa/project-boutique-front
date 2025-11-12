@@ -35,7 +35,7 @@ export default function ProductoDetallePage() {
     if (productoId) {
       fetchVariantes(Number(productoId))
     }
-  }, [productoId])
+  }, [productoId, fetchVariantes])
   
   // Establecer imagen inicial
   useEffect(() => {

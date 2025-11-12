@@ -44,7 +44,7 @@ const VariantesTable = ({ productoId }: Props) => {
 
   useEffect(() => {
     refetch(productoId);
-  }, [productoId]);
+  }, [productoId, refetch]);
 
   const handleCreate = () => {
     setSelectedVariante(undefined);

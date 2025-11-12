@@ -34,7 +34,7 @@ export default function PagoPage() {
     if (ventaId) {
       obtenerVenta(Number(ventaId));
     }
-  }, [ventaId]);
+  }, [ventaId, obtenerVenta]);
 
   const handleConfirmarPago = async () => {
     if (!ventaId || !datosPago) {

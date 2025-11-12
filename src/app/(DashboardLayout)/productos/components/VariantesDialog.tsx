@@ -43,7 +43,7 @@ const VariantesDialog = ({ open, onClose, producto }: Props) => {
     if (open) {
       refetch(producto.id);
     }
-  }, [open, producto.id]);
+  }, [open, producto.id, refetch]);
 
   const handleCreate = () => {
     setSelectedVariante(undefined);
