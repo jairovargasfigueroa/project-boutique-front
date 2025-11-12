@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { CuotaCreditoConInfo as Cuota } from "@/types/ventas";
 import { cuotaService } from "@/services/cuotaService";
 
@@ -7,7 +7,7 @@ export const useCuotas = (ventaId?: number) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const cargarCuotas = async () => {
+  const cargarCuotas = useCallback(async () => {
     if (!ventaId) return;
 
     try {
@@ -21,13 +21,13 @@ export const useCuotas = (ventaId?: number) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [ventaId]);
 
   useEffect(() => {
     if (ventaId) {
       cargarCuotas();
     }
-  }, [ventaId]);
+  }, [ventaId, cargarCuotas]);
 
   return {
     cuotas,

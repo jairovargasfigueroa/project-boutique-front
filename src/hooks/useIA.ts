@@ -32,7 +32,7 @@ export const usePredictGeneral = (params?: PredictGeneralParams) => {
     } finally {
       setLoading(false);
     }
-  }, [params?.periodo, params?.cantidad]);
+  }, [params]);
 
   useEffect(() => {
     fetchPredicciones();
@@ -66,7 +66,7 @@ export const usePredictProducto = (
     } finally {
       setLoading(false);
     }
-  }, [productoId, params?.periodo, params?.cantidad]);
+  }, [productoId, params]);
 
   useEffect(() => {
     if (productoId) {
@@ -93,7 +93,7 @@ export const useAlertas = (params?: AlertasParams) => {
     } finally {
       setLoading(false);
     }
-  }, [params?.estado, params?.limite]);
+  }, [params]);
 
   const updateAlerta = async (
     alertaId: number,

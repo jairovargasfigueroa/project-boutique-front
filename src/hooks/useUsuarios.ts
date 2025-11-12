@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { usuarioService, type UsuarioListItem } from '@/services/usuarioService';
 import type { User } from '@/types/auth';
 
@@ -7,7 +7,7 @@ export const useUsuarios = (rol?: string) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const cargarUsuarios = async () => {
+  const cargarUsuarios = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -19,7 +19,7 @@ export const useUsuarios = (rol?: string) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [rol]);
 
   const crearUsuario = async (data: Partial<User>): Promise<User> => {
     try {
@@ -55,7 +55,7 @@ export const useUsuarios = (rol?: string) => {
 
   useEffect(() => {
     cargarUsuarios();
-  }, [rol]);
+  }, [rol, cargarUsuarios]);
 
   return {
     usuarios,

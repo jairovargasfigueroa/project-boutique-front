@@ -34,7 +34,7 @@ const SeleccionarVarianteDialog = ({ open, onClose, producto }: Props) => {
     if (open) {
       refetch(producto.id);
     }
-  }, [open, producto.id]);
+  }, [open, producto.id, refetch]);
 
   const handleAgregarVariante = (variante: ProductoVariante) => {
     if (variante.stock <= 0) {

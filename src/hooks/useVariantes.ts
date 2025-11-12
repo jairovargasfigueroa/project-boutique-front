@@ -6,7 +6,7 @@ import {
   VarianteProductoCreate, 
   VarianteProductoUpdate 
 } from "@/types/productos";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 interface UseVariantesProps {
   productoId?: number;
@@ -21,7 +21,7 @@ export const useVariantes = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchVariantes = async (prodId?: number) => {
+  const fetchVariantes = useCallback(async (prodId?: number) => {
     try {
       setLoading(true);
       setError(null);
@@ -43,7 +43,7 @@ export const useVariantes = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [productoId]);
 
   const createVariante = async (data: VarianteProductoCreate) => {
     try {
@@ -122,7 +122,7 @@ export const useVariantes = ({
     if (autoFetch) {
       fetchVariantes();
     }
-  }, [productoId, autoFetch]);
+  }, [productoId, autoFetch, fetchVariantes]);
 
   return {
     // Estado
