@@ -5,7 +5,7 @@ import axios, {
 } from "axios";
 
 // URL base de la API - configurable por environment
-//const API_BASE_URL =
+// const API_BASE_URL =
 //  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "https://api.albadev.me/api";

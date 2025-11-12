@@ -91,9 +91,9 @@ const Header = () => {
                 </Badge>
               </IconButton>
               
-              <Button variant="contained" color="primary" target="_blank" href="https://www.wrappixel.com/templates/spike-nextjs-admin-template/?ref=376#demos">
+              {/* <Button variant="contained" color="primary" target="_blank" href="https://www.wrappixel.com/templates/spike-nextjs-admin-template/?ref=376#demos">
                 Check Pro Template
-              </Button>
+              </Button> */}
               <Profile />
             </Stack>
           </>

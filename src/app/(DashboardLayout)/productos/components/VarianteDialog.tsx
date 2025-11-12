@@ -38,9 +38,7 @@ const VarianteDialog: React.FC<Props> = ({
   });
 
   useEffect(() => {
-    if (initialData) {
-      setForm(initialData);
-    } else {
+    if (mode === "create") {
       setForm({
         talla: "",
         precio: 0,
@@ -48,8 +46,10 @@ const VarianteDialog: React.FC<Props> = ({
         stock_minimo: 0,
         producto: productoId,
       });
+    } else if (initialData) {
+      setForm(initialData);
     }
-  }, [initialData, productoId, open]);
+  }, [mode, initialData, productoId, open]);
 
   const handleChange = (field: string, value: any) => {
     setForm((prev) => ({ ...prev, [field]: value }));

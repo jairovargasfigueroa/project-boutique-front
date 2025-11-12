@@ -47,12 +47,15 @@ export const useVariantes = ({
 
   const createVariante = async (data: VarianteProductoCreate) => {
     try {
+      console.log("🔵 Hook useVariantes - createVariante llamado con:", data);
       setLoading(true);
       setError(null);
       const newVariante = await varianteService.create(data);
+      console.log("🟢 Hook useVariantes - Variante creada:", newVariante);
       setVariantes((prev) => [...prev, newVariante]);
       return newVariante;
     } catch (err) {
+      console.error("🔴 Hook useVariantes - Error:", err);
       setError(err instanceof Error ? err.message : "Error al crear variante");
       throw err;
     } finally {
