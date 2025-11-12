@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   CardContent,
   Typography,
@@ -60,10 +61,12 @@ const Blog = () => {
           }}>
           <BlankCard>
             <Typography component={Link} href='/'>
-              <img
+              <Image
                 src={product.photo}
                 alt='img'
-                style={{ width: '100%', height: '250px' }}
+                width={300}
+                height={250}
+                style={{ width: '100%', height: '250px', objectFit: 'cover' }}
               />
             </Typography>
             <Tooltip title='Add To Cart'>
