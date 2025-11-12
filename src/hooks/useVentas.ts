@@ -55,7 +55,7 @@ export const useVentaDetalle = (ventaId?: number) => {
     }
   }, [ventaId]);
 
-  const obtenerVenta = async (id: number) => {
+  const obtenerVenta = useCallback(async (id: number) => {
     try {
       setLoading(true);
       setError(null);
@@ -70,9 +70,9 @@ export const useVentaDetalle = (ventaId?: number) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const crearVenta = async (data: CrearVentaRequest) => {
+  const crearVenta = useCallback(async (data: CrearVentaRequest) => {
     try {
       setLoading(true);
       setError(null);
@@ -108,7 +108,7 @@ export const useVentaDetalle = (ventaId?: number) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (ventaId) {

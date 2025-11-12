@@ -17,6 +17,9 @@ export const useProductos = (filtros?: FiltrosProducto) => {
   const [variantes, setVariantes] = useState<ProductoVariante[]>([]);
   const [loadingVariantes, setLoadingVariantes] = useState(false);
 
+  // ✅ Serializar filtros para comparar por valor
+  const filtrosString = JSON.stringify(filtros);
+
   // Cargar productos
   const fetchProductos = useCallback(async () => {
     try {
@@ -32,7 +35,7 @@ export const useProductos = (filtros?: FiltrosProducto) => {
     } finally {
       setLoading(false);
     }
-  }, [filtros]);
+  }, [filtrosString]); // ← Depende del string, no del objeto
 
   const createProducto = async (data: ProductoCreate) => {
     try {
@@ -111,7 +114,7 @@ export const useProductos = (filtros?: FiltrosProducto) => {
   // Cargar productos al montar el componente y cuando cambien los filtros
   useEffect(() => {
     fetchProductos();
-  }, [fetchProductos]);
+  }, [fetchProductos]); // ← Ahora depende de fetchProductos
 
   return {
     // Estado

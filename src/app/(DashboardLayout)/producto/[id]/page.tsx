@@ -2,7 +2,7 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { 
   Box, 
@@ -13,73 +13,68 @@ import {
   Stack
 } from '@mui/material'
 import useCartStore from '@/store/cartStore'
-import { useProductos } from '@/hooks/useProductos'
+import { useProductoDetalle } from '@/hooks/useProductoDetalle'
 
 
 
 export default function ProductoDetallePage() {
   const params = useParams()
   const router = useRouter()
-  const productoId = params.id as string
+  const productoId = Number(params.id)
   
-  const { productos, variantes, loadingVariantes, fetchVariantes } = useProductos()
+  console.log("📄 ProductoDetallePage - Renderizado con params:", params);
+  console.log("📄 ProductoDetallePage - ID extraído:", productoId);
+  
+  // ✅ Hook optimizado - carga solo este producto + sus variantes
+  const { producto, variantes, loading, error } = useProductoDetalle(productoId)
   const agregarProducto = useCartStore(state => state.agregarProducto)
   
-  const producto = productos.find(p => p.id.toString() === productoId)
+  console.log("📄 Estado actual - loading:", loading, "| producto:", producto?.nombre, "| variantes:", variantes.length);
   
   const [tallaSeleccionada, setTallaSeleccionada] = useState<string | null>(null)
-  const [imagenActual, setImagenActual] = useState<string>('')
   
-  // Cargar variantes cuando se monta el componente
-  useEffect(() => {
-    if (productoId) {
-      fetchVariantes(Number(productoId))
-    }
-  }, [productoId, fetchVariantes])
-  
-  // Establecer imagen inicial
-  useEffect(() => {
-    if (producto?.image) {
-      setImagenActual(producto.image)
-    } else {
-      setImagenActual('https://placehold.co/600x500')
-    }
-  }, [producto, variantes])
+  // Imagen del producto (o placeholder si no tiene)
+  const imagenActual = producto?.image || 'https://placehold.co/600x500'
   
   // Extraer tallas únicas de las variantes
   const tallasDisponibles = Array.from(
     new Set(variantes.map(v => v.talla).filter(t => t))
   )
   
+  console.log("👕 Tallas disponibles:", tallasDisponibles);
+  console.log("👕 Talla seleccionada:", tallaSeleccionada);
+  
   // Obtener variante actual según talla seleccionada o la primera
   const varianteActual = tallaSeleccionada 
     ? variantes.find(v => v.talla === tallaSeleccionada)
     : variantes[0]
   
+  console.log("🎯 Variante actual:", varianteActual);
+  
   // Convertir precio a número si viene como string
   const precioMostrar = varianteActual?.precio 
-    ? (typeof varianteActual.precio === 'string' ? parseFloat(varianteActual.precio) : varianteActual.precio)
+    ? Number(varianteActual.precio)
     : 0
   const stockMostrar = varianteActual?.stock || 0
   
+  console.log("💰 Precio a mostrar:", precioMostrar, "| Stock:", stockMostrar);
+  
   const handleSeleccionarTalla = (talla: string) => {
+    console.log("👆 Usuario seleccionó talla:", talla);
     setTallaSeleccionada(talla)
   }
   
   const handleAgregarCarrito = () => {
-    if (!varianteActual) return
+    console.log("🛒 Intentando agregar al carrito...");
+    if (!producto || !varianteActual) return
     if (tallasDisponibles.length > 0 && !tallaSeleccionada) return
     
-    agregarProducto(producto!, varianteActual, 1)
+    console.log("✅ Agregando:", { producto: producto.nombre, variante: varianteActual, cantidad: 1 });
+    agregarProducto(producto, varianteActual, 1)
     router.push('/carrito')
   }
   
-  // Obtener imágenes para la galería (ahora solo la imagen del producto)
-  const imagenesGaleria = [
-    producto?.image,
-  ].filter(Boolean) as string[]
-  
-  if (loadingVariantes) {
+  if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
         <CircularProgress />
@@ -87,10 +82,10 @@ export default function ProductoDetallePage() {
     )
   }
   
-  if (!producto) {
+  if (error || !producto) {
     return (
       <Box p={4}>
-        <Typography variant="h5">Producto no encontrado</Typography>
+        <Typography variant="h5">{error || 'Producto no encontrado'}</Typography>
         <Button onClick={() => router.push('/catalogo')}>
           Volver al catálogo
         </Button>
@@ -119,43 +114,15 @@ export default function ProductoDetallePage() {
             {/* Imagen Principal */}
             <Box
               component="img"
-              src={imagenActual || 'https://placehold.co/600x500'}
+              src={imagenActual}
               alt={producto.nombre}
               sx={{
                 width: '100%',
                 height: 500,
                 objectFit: 'cover',
                 borderRadius: 2,
-                mb: 2
               }}
             />
-            
-            {/* Miniaturas */}
-            {imagenesGaleria.length > 1 && (
-              <Stack direction="row" spacing={1} sx={{ overflowX: 'auto' }}>
-                {imagenesGaleria.map((img, index) => (
-                  <Box
-                    key={index}
-                    component="img"
-                    src={img}
-                    alt={`${producto.nombre} ${index + 1}`}
-                    onClick={() => setImagenActual(img)}
-                    sx={{
-                      width: 80,
-                      height: 80,
-                      objectFit: 'cover',
-                      borderRadius: 1,
-                      cursor: 'pointer',
-                      border: imagenActual === img ? '3px solid' : '1px solid',
-                      borderColor: imagenActual === img ? 'primary.main' : 'grey.300',
-                      '&:hover': {
-                        opacity: 0.8
-                      }
-                    }}
-                  />
-                ))}
-              </Stack>
-            )}
           </Box>
         </Box>
 

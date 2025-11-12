@@ -399,35 +399,30 @@ const ModeloPage = () => {
                         </Box>
                       }
                       secondary={
-                        <>
-                          <Typography
-                            variant="body2"
-                            color="textSecondary"
-                            sx={{ mt: 1 }}
-                          >
+                        <Box component="span" sx={{ display: "block" }}>
+                          <Box component="span" sx={{ display: "block", mt: 1 }}>
                             📅 Entrenado el:{" "}
                             {new Date(
                               entrenamiento.fecha_entrenamiento
                             ).toLocaleString()}
-                          </Typography>
-                          <Typography variant="body2" color="textSecondary">
+                          </Box>
+                          <Box component="span" sx={{ display: "block" }}>
                             🎯 Precisión:{" "}
                             {(parseFloat(entrenamiento.r2_score) * 100).toFixed(
                               2
                             )}
                             % | 💰 Error Promedio: Bs.{" "}
                             {parseFloat(entrenamiento.mae).toFixed(2)}
-                          </Typography>
+                          </Box>
                           {entrenamiento.notas && (
-                            <Typography
-                              variant="body2"
-                              color="textSecondary"
-                              sx={{ mt: 0.5, fontStyle: "italic" }}
+                            <Box
+                              component="span"
+                              sx={{ display: "block", mt: 0.5, fontStyle: "italic" }}
                             >
                               📝 {entrenamiento.notas}
-                            </Typography>
+                            </Box>
                           )}
-                        </>
+                        </Box>
                       }
                     />
                   </ListItem>
