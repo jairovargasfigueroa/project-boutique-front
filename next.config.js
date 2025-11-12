@@ -4,6 +4,15 @@ const nextConfig = {
   reactStrictMode: true,
   images: { unoptimized: true },
 
+  // ESLint configuration para build
+  eslint: {
+    // Warning: Esto permite que el build de producción se complete exitosamente
+    // incluso si tu proyecto tiene errores de ESLint
+    ignoreDuringBuilds: false,
+    // Solo reportar errores, no warnings
+    dirs: ['src'],
+  },
+
   // Turbopack: La nueva generación de bundling de Next.js 15
   turbopack: {
     rules: {
