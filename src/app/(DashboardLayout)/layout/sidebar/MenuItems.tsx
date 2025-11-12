@@ -20,6 +20,7 @@ const Menuitems: MenuitemsType[] = [
   {
     navlabel: true,
     subheader: "HOME",
+    roles: ['admin', 'vendedor', 'cliente'],
   },
 
   {
@@ -27,7 +28,7 @@ const Menuitems: MenuitemsType[] = [
     title: "Dashboard",
     icon: "screencast-2-line-duotone",
     href: "/",
-    roles: ['admin', 'vendedor', 'cliente'],
+    roles: ['admin'],
   },
   {
     id: uniqueId(),
@@ -47,7 +48,7 @@ const Menuitems: MenuitemsType[] = [
 
   {
     id: uniqueId(),
-    title: "Inventario",
+    title: "Productos",
     icon: "box-linear",
     href: "/productos",
     roles: ['admin', 'vendedor'],
@@ -79,6 +80,7 @@ const Menuitems: MenuitemsType[] = [
   {
     navlabel: true,
     subheader: "INTELIGENCIA ARTIFICIAL",
+    roles: ['admin'],
   },
 
   {
@@ -86,6 +88,7 @@ const Menuitems: MenuitemsType[] = [
     title: "Predicciones IA",
     icon: "chart-2-line-duotone",
     href: "/ia/predicciones",
+    roles: ['admin'],
   },
 
   {
@@ -93,6 +96,7 @@ const Menuitems: MenuitemsType[] = [
     title: "Alertas de Anomalías",
     icon: "danger-triangle-line-duotone",
     href: "/ia/alertas",
+    roles: ['admin'],
   },
 
   {
@@ -100,57 +104,53 @@ const Menuitems: MenuitemsType[] = [
     title: "Modelo IA",
     icon: "cpu-bolt-line-duotone",
     href: "/ia/modelo",
-  },
-
-  {
-    navlabel: true,
-    subheader: "UTILITIES",
-  },
-
-  {
-    id: uniqueId(),
-    title: "Icons",
-    icon: "smile-circle-linear",
-    href: "/icons",
     roles: ['admin'],
   },
 
-  {
-    id: uniqueId(),
-    title: "Table",
-    icon: "tablet-line-duotone",
-    href: "/table",
-    roles: ['admin'],
-  },
+  // {
+  //   id: uniqueId(),
+  //   title: "Icons",
+  //   icon: "smile-circle-linear",
+  //   href: "/icons",
+  //   roles: ['admin'],
+  // },
 
-  {
-    id: uniqueId(),
-    title: "Form",
-    icon: "window-frame-broken",
-    href: "/sample-form",
-    roles: ['admin'],
-  },
-  {
-    id: uniqueId(),
-    title: "Sample Page",
-    icon: "window-frame-broken",
-    href: "/sample-page",
-    roles: ['admin'],
-  },
-  {
-    id: uniqueId(),
-    title: "Typography",
-    icon: "text-bold-square-line-duotone",
-    href: "/utilities/typography",
-    roles: ['admin'],
-  },
-  {
-    id: uniqueId(),
-    title: "Shadow",
-    icon: "box-minimalistic-broken",
-    href: "/utilities/shadow",
-    roles: ['admin'],
-  },
+  // {
+  //   id: uniqueId(),
+  //   title: "Table",
+  //   icon: "tablet-line-duotone",
+  //   href: "/table",
+  //   roles: ['admin'],
+  // },
+
+  // {
+  //   id: uniqueId(),
+  //   title: "Form",
+  //   icon: "window-frame-broken",
+  //   href: "/sample-form",
+  //   roles: ['admin'],
+  // },
+  // {
+  //   id: uniqueId(),
+  //   title: "Sample Page",
+  //   icon: "window-frame-broken",
+  //   href: "/sample-page",
+  //   roles: ['admin'],
+  // },
+  // {
+  //   id: uniqueId(),
+  //   title: "Typography",
+  //   icon: "text-bold-square-line-duotone",
+  //   href: "/utilities/typography",
+  //   roles: ['admin'],
+  // },
+  // {
+  //   id: uniqueId(),
+  //   title: "Shadow",
+  //   icon: "box-minimalistic-broken",
+  //   href: "/utilities/shadow",
+  //   roles: ['admin'],
+  // },
 
   {
     navlabel: true,
@@ -171,23 +171,23 @@ const Menuitems: MenuitemsType[] = [
     roles: ['admin', 'vendedor', 'cliente'],
   },
 
-  {
-    id: uniqueId(),
-    title: "Disabled",
-    icon: "forbidden-circle-line-duotone",
-    href: "",
-    disabled: true,
-    roles: ['admin'],
-  },
+  // {
+  //   id: uniqueId(),
+  //   title: "Disabled",
+  //   icon: "forbidden-circle-line-duotone",
+  //   href: "",
+  //   disabled: true,
+  //   roles: ['admin'],
+  // },
 
-  {
-    id: uniqueId(),
-    title: "External Link",
-    external: true,
-    icon: "link-bold-duotone",
-    href: "https://google.com",
-    roles: ['admin'],
-  },
+  // {
+  //   id: uniqueId(),
+  //   title: "External Link",
+  //   external: true,
+  //   icon: "link-bold-duotone",
+  //   href: "https://google.com",
+  //   roles: ['admin'],
+  // },
 ];
 
 export default Menuitems;

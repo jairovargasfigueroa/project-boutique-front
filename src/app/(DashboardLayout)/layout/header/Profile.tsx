@@ -63,13 +63,13 @@ const Profile = () => {
           },
         }}
       >
-        <MenuItem>
+        {/* <MenuItem>
           <ListItemIcon>
             <IconUser width={20} />
           </ListItemIcon>
           <ListItemText>My Profile</ListItemText>
-        </MenuItem>
-        <MenuItem>
+        </MenuItem> */}
+        {/* <MenuItem>
           <ListItemIcon>
             <IconMail width={20} />
           </ListItemIcon>
@@ -80,7 +80,7 @@ const Profile = () => {
             <IconListCheck width={20} />
           </ListItemIcon>
           <ListItemText>My Tasks</ListItemText>
-        </MenuItem>
+        </MenuItem> */}
         <Box
           sx={{
             mt: 1,

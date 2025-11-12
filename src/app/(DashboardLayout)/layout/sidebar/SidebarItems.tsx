@@ -95,9 +95,6 @@ const SidebarItems = () => {
 
     // Filtrar items según el rol del usuario
     const filteredMenuItems = Menuitems.filter(item => {
-        // Si es un subheader (navlabel), siempre mostrar
-        if (item.navlabel) return true;
-        
         // Si no tiene roles definidos, mostrar a todos
         if (!item.roles) return true;
         

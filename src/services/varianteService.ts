@@ -21,6 +21,7 @@ export const varianteService = {
   create: async (data: VarianteProductoCreate) => {
     console.log("Creando variante:", data);
     const response = await apiClient.post<ProductoVariante>(ENDPOINT, data);
+    console.log("✅ Respuesta API crear variante:", response.data);
     return response.data;
   },
 
